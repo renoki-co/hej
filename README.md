@@ -1,5 +1,5 @@
-Hej! - A Socialite boilerplate for Laravel
-==========================================
+Hej! - Socialite boilerplate for Laravel
+========================================
 
 ![](images/hej.png)
 
