@@ -2,9 +2,6 @@
 
 namespace RenokiCo\Hej\Test;
 
-use Illuminate\Contracts\Session\Session;
-use Laravel\Socialite\Contracts\Factory as Socialite;
-use Mockery as m;
 use RenokiCo\Hej\Test\Models\User;
 
 class ProviderTest extends TestCase
@@ -44,26 +41,26 @@ class ProviderTest extends TestCase
 
         $expected = [
             'id' => 1,
-            "model_type" => "RenokiCo\Hej\Test\Models\User",
-            "model_id" => "1",
-            "provider" => "github",
-            "provider_id" => "1234",
-            "provider_nickname" => "rennokki",
-            "provider_name" => "rennokki",
-            "provider_email" => "test@test.com",
-            "provider_avatar" => "https://avatars2.githubusercontent.com/u/21983456?v=4",
-            "provider_data" => [
-              "login" => "rennokki",
-              "id" => 1234,
-              "avatar_url" => "https://avatars2.githubusercontent.com/u/21983456?v=4",
-              "url" => "https://api.github.com/users/rennokki",
-              "email" => "test@test.com",
-              "name" => "rennokki",
+            'model_type' => "RenokiCo\Hej\Test\Models\User",
+            'model_id' => '1',
+            'provider' => 'github',
+            'provider_id' => '1234',
+            'provider_nickname' => 'rennokki',
+            'provider_name' => 'rennokki',
+            'provider_email' => 'test@test.com',
+            'provider_avatar' => 'https://avatars2.githubusercontent.com/u/21983456?v=4',
+            'provider_data' => [
+                'login' => 'rennokki',
+                'id' => 1234,
+                'avatar_url' => 'https://avatars2.githubusercontent.com/u/21983456?v=4',
+                'url' => 'https://api.github.com/users/rennokki',
+                'email' => 'test@test.com',
+                'name' => 'rennokki',
             ],
-            "token" => "token_123",
-            "token_secret" => null,
-            "refresh_token" => null,
-            "token_expires_at" => null,
+            'token' => 'token_123',
+            'token_secret' => null,
+            'refresh_token' => null,
+            'token_expires_at' => null,
         ];
 
         $existingData = $social->setHidden([])->toArray();
@@ -99,26 +96,26 @@ class ProviderTest extends TestCase
 
         $expected = [
             'id' => 1,
-            "model_type" => "RenokiCo\Hej\Test\Models\User",
-            "model_id" => "1",
-            "provider" => "github",
-            "provider_id" => "1234",
-            "provider_nickname" => "rennokki",
-            "provider_name" => "rennokki",
-            "provider_email" => "test@test.com",
-            "provider_avatar" => "https://avatars2.githubusercontent.com/u/21983456?v=4",
-            "provider_data" => [
-              "login" => "rennokki",
-              "id" => 1234,
-              "avatar_url" => "https://avatars2.githubusercontent.com/u/21983456?v=4",
-              "url" => "https://api.github.com/users/rennokki",
-              "email" => "test@test.com",
-              "name" => "rennokki",
+            'model_type' => "RenokiCo\Hej\Test\Models\User",
+            'model_id' => '1',
+            'provider' => 'github',
+            'provider_id' => '1234',
+            'provider_nickname' => 'rennokki',
+            'provider_name' => 'rennokki',
+            'provider_email' => 'test@test.com',
+            'provider_avatar' => 'https://avatars2.githubusercontent.com/u/21983456?v=4',
+            'provider_data' => [
+                'login' => 'rennokki',
+                'id' => 1234,
+                'avatar_url' => 'https://avatars2.githubusercontent.com/u/21983456?v=4',
+                'url' => 'https://api.github.com/users/rennokki',
+                'email' => 'test@test.com',
+                'name' => 'rennokki',
             ],
-            "token" => "token_123",
-            "token_secret" => null,
-            "refresh_token" => null,
-            "token_expires_at" => null,
+            'token' => 'token_123',
+            'token_secret' => null,
+            'refresh_token' => null,
+            'token_expires_at' => null,
         ];
 
         $existingData = $social->setHidden([])->toArray();
