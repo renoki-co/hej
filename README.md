@@ -5,7 +5,7 @@ Hej! - Socialite boilerplate for Laravel
 
 ![CI](https://github.com/renoki-co/hej/workflows/CI/badge.svg?branch=master)
 [![codecov](https://codecov.io/gh/renoki-co/hej/branch/master/graph/badge.svg)](https://codecov.io/gh/renoki-co/hej/branch/master)
-[![StyleCI](https://github.styleci.io/repos282196287/shield?branch=master)](https://github.styleci.io/repos/282196287)
+[![StyleCI](https://github.styleci.io/repos/282196287/shield?branch=master)](https://github.styleci.io/repos/282196287)
 [![Latest Stable Version](https://poser.pugx.org/renoki-co/hej/v/stable)](https://packagist.org/packages/renoki-co/hej)
 [![Total Downloads](https://poser.pugx.org/renoki-co/hej/downloads)](https://packagist.org/packages/renoki-co/hej)
 [![Monthly Downloads](https://poser.pugx.org/renoki-co/hej/d/monthly)](https://packagist.org/packages/renoki-co/hej)
