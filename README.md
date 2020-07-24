@@ -79,7 +79,9 @@ Hej! is really flexible and does a lot of things in the background to register o
 However, you need to extend the controller and you will then be able to replace some methods to customize the flow.
 
 ```php
-class MySocialController extends BaseSocialController
+use RenokiCo\Hej\Http\Controllers\SocialController;
+
+class MySocialController extends SocialController
 {
     //
 }
