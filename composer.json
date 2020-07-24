@@ -1,27 +1,28 @@
 {
-    "name": "renoki-co/:package_name",
-    "description": ":package_description",
-    "keywords": ["laravel", "php"],
+    "name": "renoki-co/hej",
+    "description": "Hej! is a simple authentication boilerplate for Socialite.",
+    "keywords": ["laravel", "php", "social", "login", "register", "socialite", "facebook", "github", "twitter", "gitlab", "google"],
     "license": "MIT",
-    "homepage": "https://github.com/renoki-co/:package_name",
+    "homepage": "https://github.com/renoki-co/hej",
     "authors": [
         {
-            "name": ":author_name",
-            "homepage": ":author_link",
+            "name": "Alex Renoki",
+            "homepage": "https://github.com/rennokki",
             "role": "Developer"
         }
     ],
     "require": {
-        "php": ">=7.2"
+        "laravel/framework": "^6.2|^7.0",
+        "laravel/socialite": "^4.4"
     },
     "autoload": {
         "psr-4": {
-            "RenokiCo\\:package_namespace\\": "src/"
+            "RenokiCo\\Hej\\": "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "RenokiCo\\:package_namespace\\Test\\": "tests"
+            "RenokiCo\\Hej\\Test\\": "tests"
         }
     },
     "scripts": {
@@ -38,7 +39,7 @@
     "extra": {
         "laravel": {
             "providers": [
-                "RenokiCo\\:package_namespace\\:package_service_provider"
+                "RenokiCo\\Hej\\HejServiceProvider"
             ]
         }
     }
