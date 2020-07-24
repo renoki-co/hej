@@ -29,8 +29,9 @@
         "test": "vendor/bin/phpunit"
     },
     "require-dev": {
+        "orchestra/database": "^5.0",
         "orchestra/testbench": "^5.0",
-        "orchestra/database": "^5.0"
+        "orchestra/testbench-browser-kit": "^5.0"
     },
     "config": {
         "sort-packages": true

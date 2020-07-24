@@ -7,6 +7,15 @@ use Illuminate\Http\Request;
 trait HandlesSocialRequests
 {
     /**
+     * Whitelist social providers to be used.
+     *
+     * @var array
+     */
+    protected static $allowedSocialiteProviders = [
+        //
+    ];
+
+    /**
      * Redirect the user to the OAuth portal.
      *
      * @param  \Illuminate\Http\Request  $request
@@ -15,6 +24,10 @@ trait HandlesSocialRequests
      */
     public function redirect(Request $request, string $provider)
     {
+        if ($this->rejectProvider($provider)) {
+            return $this->providerRejected($request, $provider);
+        }
+
         return $this->getSocialiteRedirect($request, $provider);
     }
 
@@ -27,6 +40,10 @@ trait HandlesSocialRequests
      */
     public function callback(Request $request, string $provider)
     {
+        if ($this->rejectProvider($provider)) {
+            return $this->providerRejected($request, $provider);
+        }
+
         $providerUser = $this->getSocialiteUser($request, $provider);
 
         // If the Social is attached to any authenticatable model,
@@ -122,5 +139,21 @@ trait HandlesSocialRequests
         );
 
         return true;
+    }
+
+    /**
+     * Wether the provider is rejected by the current
+     * whitelist status.
+     *
+     * @param  string  $provider
+     * @return bool
+     */
+    protected function rejectProvider(string $provider): bool
+    {
+        if (static::$allowedSocialiteProviders === ['*']) {
+            return true;
+        }
+
+        return ! in_array($provider, static::$allowedSocialiteProviders);
     }
 }

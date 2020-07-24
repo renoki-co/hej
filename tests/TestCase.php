@@ -3,7 +3,7 @@
 namespace RenokiCo\Hej\Test;
 
 use Laravel\Socialite\Contracts\Factory as Socialite;
-use Orchestra\Testbench\TestCase as Orchestra;
+use Orchestra\Testbench\BrowserKit\TestCase as Orchestra;
 
 abstract class TestCase extends Orchestra
 {

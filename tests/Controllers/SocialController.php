@@ -8,6 +8,15 @@ use RenokiCo\Hej\Http\Controllers\SocialController as BaseSocialController;
 class SocialController extends BaseSocialController
 {
     /**
+     * Whitelist social providers to be used.
+     *
+     * @var array
+     */
+    protected static $allowedSocialiteProviders = [
+        'github',
+    ];
+
+    /**
      * Get the Authenticatable model data to fill on register.
      * When the user gets created, it will receive these parameters
      * in the `::create()` method.

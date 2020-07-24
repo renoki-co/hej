@@ -8,6 +8,7 @@ use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Hash;
 use Laravel\Socialite\Contracts\Factory as Socialite;
 use RenokiCo\Hej\Concerns\HandlesSocialRequests;
+use Str;
 
 class SocialController extends Controller
 {
@@ -52,7 +53,7 @@ class SocialController extends Controller
      *
      * @param  \Illuminate\Http\Request  $request
      * @param  string  $provider
-     * @return mixed
+     * @return \Laravel\Socialite\AbstractUser
      */
     protected function getSocialiteUser(Request $request, string $provider)
     {
@@ -89,7 +90,7 @@ class SocialController extends Controller
             'name' => $providerUser->getName(),
             'email' => $providerUser->getEmail(),
             'email_verified_at' => now(),
-            'password' => Hash::make('test'),
+            'password' => Hash::make(Str::random(64)),
         ];
     }
 
@@ -118,10 +119,10 @@ class SocialController extends Controller
     }
 
     /**
-     * Login the user.
+     * Handle the user login and redirection.
      *
      * @param  \Illuminate\Database\Eloquent\Model  $model
-     * @return Illuminate\Http\Redirectresponse
+     * @return Illuminate\Http\RedirectResponse
      */
     protected function authenticateModel($model)
     {
@@ -133,7 +134,23 @@ class SocialController extends Controller
     }
 
     /**
-     * Run logic after the registration process.
+     * Handle the callback when a provider gets rejected.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  string  $provider
+     * @return Illuminate\Http\RedirectResponse
+     */
+    protected function providerRejected(Request $request, $provider)
+    {
+        $provider = ucfirst($provider);
+
+        session()->flash('social', "The authentication with {$provider} failed!");
+
+        return redirect(route('home'));
+    }
+
+    /**
+     * Handle the callback after the registration process.
      *
      * @param  \Illuminate\Database\Eloquent\Model  $model
      * @param  \Illuminate\Database\Eloquent\Model  $social
@@ -146,7 +163,7 @@ class SocialController extends Controller
     }
 
     /**
-     * Run logic after the login process.
+     * Handle the callback after the login process.
      *
      * @param  \Illuminate\Database\Eloquent\Model  $model
      * @param  \Illuminate\Database\Eloquent\Model  $social
