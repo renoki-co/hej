@@ -3,6 +3,7 @@
 namespace RenokiCo\Hej\Concerns;
 
 use Illuminate\Http\Request;
+use RenokiCo\Hej\Social;
 
 trait HandlesSocialRequests
 {
@@ -50,10 +51,10 @@ trait HandlesSocialRequests
         // then jump off and login.
 
         if ($model = $this->getModelBySocialId($provider, $providerUser->getId())) {
-            $this->updateSocialInstance($request, $provider, $model, $providerUser);
+            $social = $this->updateSocialInstance($request, $provider, $model, $providerUser);
 
             $this->authenticated(
-                $model, $this->getSocialById($provider, $providerUser->getId()), $providerUser
+                $model, $social, $providerUser
             );
 
             return $this->authenticateModel($model);
@@ -75,7 +76,7 @@ trait HandlesSocialRequests
             'provider_id' => $providerUser->getId(),
         ]);
 
-        $this->updateSocialInstance($request, $social, $model, $providerUser);
+        $social = $this->updateSocialInstance($request, $social, $model, $providerUser);
 
         $this->registered($model, $social, $providerUser);
 
@@ -120,7 +121,7 @@ trait HandlesSocialRequests
      * @param  string|\Illuminate\Database\Eloquent\Model  $provider
      * @param  \Illuminate\Database\Eloquent\Model  $model
      * @param  \Laravel\Socialite\AbstractUser  $providerUser
-     * @return bool
+     * @return \Illuminate\Database\Eloquent\Model
      */
     protected function updateSocialInstance(Request $request, $provider, $model, $providerUser)
     {
@@ -138,7 +139,7 @@ trait HandlesSocialRequests
             )
         );
 
-        return true;
+        return $social;
     }
 
     /**
