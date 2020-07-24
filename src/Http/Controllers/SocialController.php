@@ -151,7 +151,7 @@ class SocialController extends Controller
 
     /**
      * Handle the callback when the user's social account
-     * E-Mail address is already registered.
+     * E-Mail address is already used.
      *
      * @param  \Illuminate\Http\Request  $request
      * @param  string  $provider
@@ -163,7 +163,7 @@ class SocialController extends Controller
         $provider = ucfirst($provider);
 
         session()->flash(
-            'social', "The E-Mail address associated with your {$provider} account is already registered."
+            'social', "The E-Mail address associated with your {$provider} account is already used."
         );
 
         return redirect(route('register'));
