@@ -120,7 +120,7 @@ If one of the providers accessed via the URL is not whitelisted, a simple redire
  *
  * @param  \Illuminate\Http\Request  $request
  * @param  string  $provider
- * @return Illuminate\Http\RedirectResponse
+ * @return \Illuminate\Http\RedirectResponse
  */
 protected function providerRejected(Request $request, $provider)
 {
@@ -294,7 +294,7 @@ This is how the default method looks like:
  * Handle the user login and redirection.
  *
  * @param  \Illuminate\Database\Eloquent\Model  $model
- * @return Illuminate\Http\RedirectResponse
+ * @return \Illuminate\Http\RedirectResponse
  */
 protected function authenticateModel($model)
 {
