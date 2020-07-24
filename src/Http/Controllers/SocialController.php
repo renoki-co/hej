@@ -150,6 +150,26 @@ class SocialController extends Controller
     }
 
     /**
+     * Handle the callback when the user's social account
+     * E-Mail address is already registered.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  string  $provider
+     * @param  \Laravel\Socialite\AbstractUser  $providerUser
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    protected function duplicateEmail(Request $request, $provider, $providerUser)
+    {
+        $provider = ucfirst($provider);
+
+        session()->flash(
+            'social', "The E-Mail address associated with your {$provider} account is already registered."
+        );
+
+        return redirect(route('register'));
+    }
+
+    /**
      * Handle the callback after the registration process.
      *
      * @param  \Illuminate\Database\Eloquent\Model  $model

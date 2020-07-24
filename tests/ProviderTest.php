@@ -126,4 +126,24 @@ class ProviderTest extends TestCase
             );
         }
     }
+
+    public function test_register_with_existent_email()
+    {
+        $this->mockSocialiteFacade(
+            \Laravel\Socialite\Two\GithubProvider::class
+        );
+
+        $socialModel = config('hej.models.social');
+
+        $user = factory(User::class)->create(['email' => 'test@test.com']);
+
+        $this->assertCount(0, $user->socials()->get());
+
+        $this->json('GET', route('callback', ['provider' => 'github']))
+            ->assertRedirectedToRoute('register');
+
+        $this->assertCount(0, $user->socials()->get());
+
+        $this->assertEquals(0, $socialModel::count());
+    }
 }
