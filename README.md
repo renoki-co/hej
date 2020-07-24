@@ -1,5 +1,7 @@
-Hej! - A Socialite boilerplate
-==============================
+Hej! - A Socialite boilerplate for Laravel
+==========================================
+
+![](images/hej.png)
 
 ![CI](https://github.com/renoki-co/hej/workflows/CI/badge.svg?branch=master)
 [![codecov](https://codecov.io/gh/renoki-co/hej/branch/master/graph/badge.svg)](https://codecov.io/gh/renoki-co/hej/branch/master)
