@@ -65,6 +65,10 @@ trait HandlesSocialRequests
 
         $authenticatable = $this->getAuthenticatable($request, $provider);
 
+        if ($this->emailAlreadyExists($provider, $authenticatable, $providerUser)) {
+            return $this->duplicateEmail($request, $provider, $providerUser);
+        }
+
         $model = $authenticatable::create(
             $this->getRegisterData(
                 $request, $provider, $providerUser
@@ -111,6 +115,26 @@ trait HandlesSocialRequests
         return $socialModel::whereProvider($provider)
             ->whereProviderId($id)
             ->first();
+    }
+
+    /**
+     * Check if the E-Mail address already exists.
+     *
+     * @param  string  $provider
+     * @param  \Illuminate\Database\Eloquent\Model  $model
+     * @param  \Laravel\Socialite\AbstractUser  $providerUser
+     * @return bool
+     */
+    protected function emailAlreadyExists(string $provider, $model, $providerUser): bool
+    {
+        if (! $model = $model::whereEmail($providerUser->getEmail())->first()) {
+            return false;
+        }
+
+        return ! $model->socials()
+            ->whereProvider($provider)
+            ->whereProviderId($providerUser->getId())
+            ->exists();
     }
 
     /**

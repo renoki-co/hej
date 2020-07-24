@@ -122,7 +122,7 @@ class SocialController extends Controller
      * Handle the user login and redirection.
      *
      * @param  \Illuminate\Database\Eloquent\Model  $model
-     * @return Illuminate\Http\RedirectResponse
+     * @return \Illuminate\Http\RedirectResponse
      */
     protected function authenticateModel($model)
     {
@@ -138,7 +138,7 @@ class SocialController extends Controller
      *
      * @param  \Illuminate\Http\Request  $request
      * @param  string  $provider
-     * @return Illuminate\Http\RedirectResponse
+     * @return \Illuminate\Http\RedirectResponse
      */
     protected function providerRejected(Request $request, $provider)
     {
@@ -147,6 +147,26 @@ class SocialController extends Controller
         session()->flash('social', "The authentication with {$provider} failed!");
 
         return redirect(route('home'));
+    }
+
+    /**
+     * Handle the callback when the user's social account
+     * E-Mail address is already used.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  string  $provider
+     * @param  \Laravel\Socialite\AbstractUser  $providerUser
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    protected function duplicateEmail(Request $request, $provider, $providerUser)
+    {
+        $provider = ucfirst($provider);
+
+        session()->flash(
+            'social', "The E-Mail address associated with your {$provider} account is already used."
+        );
+
+        return redirect(route('register'));
     }
 
     /**

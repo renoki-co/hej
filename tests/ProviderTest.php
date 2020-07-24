@@ -8,14 +8,14 @@ class ProviderTest extends TestCase
 {
     public function test_redirect_should_redirect_to_provider_website()
     {
-        $response = $this
+        $this
             ->call('GET', route('redirect', ['provider' => 'github']))
             ->assertStatus(302);
     }
 
     public function test_redirect_should_not_redirect_for_unwhitelisted_providers()
     {
-        $response = $this
+        $this
             ->call('GET', route('redirect', ['provider' => 'facebook']))
             ->assertRedirectedToRoute('home');
     }
@@ -26,7 +26,7 @@ class ProviderTest extends TestCase
             \Laravel\Socialite\Two\GithubProvider::class
         );
 
-        $response = $this->call('GET', route('callback', ['provider' => 'github']))
+        $this->call('GET', route('callback', ['provider' => 'github']))
             ->assertStatus(302);
 
         $this->assertNotNull(
@@ -78,10 +78,10 @@ class ProviderTest extends TestCase
             \Laravel\Socialite\Two\GithubProvider::class
         );
 
-        $response = $this->call('GET', route('callback', ['provider' => 'github']))
+        $this->call('GET', route('callback', ['provider' => 'github']))
             ->assertStatus(302);
 
-        $response = $this->call('GET', route('callback', ['provider' => 'github']))
+        $this->call('GET', route('callback', ['provider' => 'github']))
             ->assertStatus(302);
 
         $this->assertNotNull(
@@ -125,5 +125,25 @@ class ProviderTest extends TestCase
                 $existingData[$key], $value
             );
         }
+    }
+
+    public function test_register_with_existent_email()
+    {
+        $this->mockSocialiteFacade(
+            \Laravel\Socialite\Two\GithubProvider::class
+        );
+
+        $socialModel = config('hej.models.social');
+
+        $user = factory(User::class)->create(['email' => 'test@test.com']);
+
+        $this->assertCount(0, $user->socials()->get());
+
+        $this->json('GET', route('callback', ['provider' => 'github']))
+            ->assertRedirectedToRoute('register');
+
+        $this->assertCount(0, $user->socials()->get());
+
+        $this->assertEquals(0, $socialModel::count());
     }
 }

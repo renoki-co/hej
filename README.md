@@ -120,7 +120,7 @@ If one of the providers accessed via the URL is not whitelisted, a simple redire
  *
  * @param  \Illuminate\Http\Request  $request
  * @param  string  $provider
- * @return Illuminate\Http\RedirectResponse
+ * @return \Illuminate\Http\RedirectResponse
  */
 protected function providerRejected(Request $request, $provider)
 {
@@ -251,6 +251,34 @@ protected function getRegisterData(Request $request, string $provider, $provider
 }
 ```
 
+## Handling duplicated E-Mail addresses
+
+Sometimes, it can happen for the users to have an account created using the E-Mail address and using no social accounts and suddenly, a new account will be created if someone would log in with a social account with the same E-Mail address.
+
+To address this issue, you may handle the redirection within `duplicateEmail`:
+
+```php
+/**
+ * Handle the callback when the user's social account
+ * E-Mail address is already used.
+ *
+ * @param  \Illuminate\Http\Request  $request
+ * @param  string  $provider
+ * @param  \Laravel\Socialite\AbstractUser  $providerUser
+ * @return \Illuminate\Http\RedirectResponse
+ */
+protected function duplicateEmail(Request $request, $provider, $providerUser)
+{
+    $provider = ucfirst($provider);
+
+    session()->flash(
+        'social', "The E-Mail address associated with your {$provider} account is already used."
+    );
+
+    return redirect(route('register'));
+}
+```
+
 ## Filling the Social table
 
 After registration or login, the Socialite data gets created or updated, either the user existed or not.
@@ -294,7 +322,7 @@ This is how the default method looks like:
  * Handle the user login and redirection.
  *
  * @param  \Illuminate\Database\Eloquent\Model  $model
- * @return Illuminate\Http\RedirectResponse
+ * @return \Illuminate\Http\RedirectResponse
  */
 protected function authenticateModel($model)
 {
