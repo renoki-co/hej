@@ -253,9 +253,9 @@ protected function getRegisterData(Request $request, string $provider, $provider
 
 ## Handling duplicated E-Mail addresses
 
-Sometimes, it can happen for the users to have an account created using the E-Mail address and using no social accounts and suddenly, a new account will be created if someone would log in with a social account with the same E-Mail address.
+Sometimes, it can happen for the users to have an account created with E-Mail address only, having no social accounts. A new social account with the same E-Mail address will trigger a new authenticatable record in the database on callback.
 
-To address this issue, you may handle the redirection within `duplicateEmail`:
+Hej! addresses this issue by checking for duplicated E-Mail address. You may handle the redirection within `duplicateEmail`:
 
 ```php
 /**
