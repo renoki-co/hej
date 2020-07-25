@@ -13,10 +13,18 @@ class ProviderTest extends TestCase
             ->assertStatus(302);
     }
 
-    public function test_redirect_should_not_redirect_for_unwhitelisted_providers()
+    public function test_should_not_redirect_or_callback_for_unwhitelisted_providers()
     {
         $this
             ->call('GET', route('redirect', ['provider' => 'facebook']))
+            ->assertRedirectedToRoute('home');
+
+        $this
+            ->call('GET', route('callback', ['provider' => 'facebook']))
+            ->assertRedirectedToRoute('home');
+
+        $this
+            ->call('GET', route('unlink', ['provider' => 'facebook']))
             ->assertRedirectedToRoute('home');
     }
 
