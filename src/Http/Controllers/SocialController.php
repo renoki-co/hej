@@ -75,6 +75,20 @@ class SocialController extends Controller
     }
 
     /**
+     * Get the key to store into session the authenticatable
+     * primary key to be checked on returning from OAuth.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  string  $provider
+     * @param  \Illuminate\Database\Eloquent\Model|null  $model
+     * @return string
+     */
+    public function getLinkSessionKey(Request $request, string $provider, $model): string
+    {
+        return $model ? "hej_{$provider}_{$model->getKey()}" : '';
+    }
+
+    /**
      * Get the Authenticatable model data to fill on register.
      * When the user gets created, it will receive these parameters
      * in the `::create()` method.
@@ -170,6 +184,84 @@ class SocialController extends Controller
     }
 
     /**
+     * Handle the callback when the user tries
+     * to link a social account when it
+     * already has one, with the same provider.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  string  $provider
+     * @param  \Illuminate\Database\Eloquent\Model  $model
+     * @param  \Laravel\Socialite\AbstractUser  $providerUser
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    protected function providerAlreadyLinked(Request $request, $provider, $model, $providerUser)
+    {
+        $provider = ucfirst($provider);
+
+        session()->flash(
+            'social', "You already have a {$provider} account linked."
+        );
+
+        return redirect(route('home'));
+    }
+
+    /**
+     * Handle the callback when the user tries
+     * to link a social account that is already existent.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  string  $provider
+     * @param  \Illuminate\Database\Eloquent\Model  $model
+     * @param  \Laravel\Socialite\AbstractUser  $providerUser
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    protected function providerAlreadyLinkedByAnotherAuthenticatable(Request $request, $provider, $model, $providerUser)
+    {
+        $provider = ucfirst($provider);
+
+        session()->flash(
+            'social', "Your {$provider} account is already linked to another account."
+        );
+
+        return redirect(route('home'));
+    }
+
+    /**
+     * Handle the user redirect after linking.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  \Illuminate\Database\Eloquent\Model  $model
+     * @param  \Illuminate\Database\Eloquent\Model  $social
+     * @param  \Laravel\Socialite\AbstractUser  $providerUser
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    protected function redirectAfterLink(Request $request, $model, $social, $providerUser)
+    {
+        $provider = ucfirst($social->provider);
+
+        session()->flash('social', "The {$provider} account has been linked to your account.");
+
+        return redirect(route('home'));
+    }
+
+    /**
+     * Handle the user redirect after unlinking.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  \Illuminate\Database\Eloquent\Model  $model
+     * @param  string  $provider
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    protected function redirectAfterUnlink(Request $request, $model, string $provider)
+    {
+        $provider = ucfirst($provider);
+
+        session()->flash('social', "The {$provider} account has been unlinked.");
+
+        return redirect(route('home'));
+    }
+
+    /**
      * Handle the callback after the registration process.
      *
      * @param  \Illuminate\Database\Eloquent\Model  $model
@@ -191,6 +283,31 @@ class SocialController extends Controller
      * @return void
      */
     protected function authenticated($model, $social, $providerUser)
+    {
+        //
+    }
+
+    /**
+     * Handle the callback after the linking process.
+     *
+     * @param  \Illuminate\Database\Eloquent\Model  $model
+     * @param  \Illuminate\Database\Eloquent\Model  $social
+     * @param  \Laravel\Socialite\AbstractUser  $providerUser
+     * @return void
+     */
+    protected function linked($model, $social, $providerUser)
+    {
+        //
+    }
+
+    /**
+     * Handle the callback after the unlink process.
+     *
+     * @param  \Illuminate\Database\Eloquent\Model  $model
+     * @param  string  $provider
+     * @return void
+     */
+    protected function unlinked($model, string $provider)
     {
         //
     }

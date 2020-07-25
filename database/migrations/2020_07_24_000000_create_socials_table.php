@@ -31,6 +31,8 @@ class CreateSocialsTable extends Migration
 
             $table->index(['model_id', 'model_type']);
             $table->index(['provider', 'provider_id']);
+
+            $table->index(['provider', 'provider_id', 'model_id', 'model_type'], 'mix');
         });
     }
 
