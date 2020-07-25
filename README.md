@@ -1,4 +1,4 @@
-Hej! - a Socialite authentication flow boilerplate
+**Hej**! - a Socialite authentication flow boilerplate
 ==================================================
 
 ![](images/hej.png)
@@ -64,6 +64,12 @@ After you have configured Socialite, the only thing to do is to point your desir
 ```php
 Route::get('/social/{provider}/redirect', 'RenokiCo\Hej\Http\Controllers\SocialController@redirect')
 Route::get('/social/{provider}/callback', 'RenokiCo\Hej\Http\Controllers\SocialController@callback');
+
+Route::get('/social/{provider}/link', 'RenokiCo\Hej\Http\Controllers\SocialController@link')
+    ->middleware('auth');
+
+Route::get('/social/{provider}/unlink', 'RenokiCo\Hej\Http\Controllers\SocialController@unlink')
+    ->middleware('auth');
 ```
 
 The paths can be any, as long as they contain a first parameter which is going to be the provider you try to authenticate with. For example, accessing this link will redirect to Github:
@@ -187,6 +193,133 @@ protected function getSocialiteUser(Request $request, string $provider)
         ->driver($provider)
         ->stateless()
         ->user();
+}
+```
+
+## Link & Unlink
+
+Prior to creating new accounts or logging in with Socialite providers, Hej! comes with support to link and unlink Social accounts to and from your users.
+
+You will need to have the routes accessible only for your authenticated users:
+
+```php
+Route::get('/social/{provider}/link', 'RenokiCo\Hej\Http\Controllers\SocialController@link')
+    ->middleware('auth');
+
+Route::get('/social/{provider}/unlink', 'RenokiCo\Hej\Http\Controllers\SocialController@unlink')
+    ->middleware('auth');
+```
+
+Further, you may access the URLs to link or unlink providers.
+
+Additionally, you may implement custom redirect for various events happening during link/unlink:
+
+```php
+/**
+ * Handle the callback when the user tries
+ * to link a social account when it
+ * already has one, with the same provider.
+ *
+ * @param  \Illuminate\Http\Request  $request
+ * @param  string  $provider
+ * @param  \Illuminate\Database\Eloquent\Model  $model
+ * @param  \Laravel\Socialite\AbstractUser  $providerUser
+ * @return \Illuminate\Http\RedirectResponse
+ */
+protected function providerAlreadyLinked(Request $request, $provider, $model, $providerUser)
+{
+    $provider = ucfirst($provider);
+
+    session()->flash(
+        'social', "You already have a {$provider} account linked."
+    );
+
+    return redirect(route('home'));
+}
+
+/**
+ * Handle the callback when the user tries
+ * to link a social account that is already existent.
+ *
+ * @param  \Illuminate\Http\Request  $request
+ * @param  string  $provider
+ * @param  \Illuminate\Database\Eloquent\Model  $model
+ * @param  \Laravel\Socialite\AbstractUser  $providerUser
+ * @return \Illuminate\Http\RedirectResponse
+ */
+protected function providerAlreadyLinkedByAnotherAuthenticatable(Request $request, $provider, $model, $providerUser)
+{
+    $provider = ucfirst($provider);
+
+    session()->flash(
+        'social', "Your {$provider} account is already linked to another account."
+    );
+
+    return redirect(route('home'));
+}
+
+/**
+ * Handle the user redirect after linking.
+ *
+ * @param  \Illuminate\Http\Request  $request
+ * @param  \Illuminate\Database\Eloquent\Model  $model
+ * @param  \Illuminate\Database\Eloquent\Model  $social
+ * @param  \Laravel\Socialite\AbstractUser  $providerUser
+ * @return \Illuminate\Http\RedirectResponse
+ */
+protected function redirectAfterLink(Request $request, $model, $social, $providerUser)
+{
+    $provider = ucfirst($social->provider);
+
+    session()->flash('social', "The {$provider} account has been linked to your account.");
+
+    return redirect(route('home'));
+}
+
+/**
+ * Handle the user redirect after unlinking.
+ *
+ * @param  \Illuminate\Http\Request  $request
+ * @param  \Illuminate\Database\Eloquent\Model  $model
+ * @param  string  $provider
+ * @return \Illuminate\Http\RedirectResponse
+ */
+protected function redirectAfterUnlink(Request $request, $model, string $provider)
+{
+    $provider = ucfirst($provider);
+
+    session()->flash('social', "The {$provider} account has been unlinked.");
+
+    return redirect(route('home'));
+}
+```
+
+In support to this, you may also benefit from two callbacks where you can run your custom business logic:
+
+```php
+/**
+ * Handle the callback after the linking process.
+ *
+ * @param  \Illuminate\Database\Eloquent\Model  $model
+ * @param  \Illuminate\Database\Eloquent\Model  $social
+ * @param  \Laravel\Socialite\AbstractUser  $providerUser
+ * @return void
+ */
+protected function linked($model, $social, $providerUser)
+{
+    //
+}
+
+/**
+ * Handle the callback after the unlink process.
+ *
+ * @param  \Illuminate\Database\Eloquent\Model  $model
+ * @param  string  $provider
+ * @return void
+ */
+protected function unlinked($model, string $provider)
+{
+    //
 }
 ```
 
