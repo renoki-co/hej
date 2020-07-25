@@ -180,26 +180,16 @@ class ProviderTest extends TestCase
             0, $user->socials()->get()
         );
 
-        $user->socials()->create([
-            'provider' => 'github',
-            'provider_id' => '123',
-        ]);
-
-        // Calling it again wont link it again.
-        $response = $this
+        $this
             ->call('GET', route('callback', ['provider' => 'github']))
-            ->assertRedirectedToRoute('home');
+            ->assertStatus(302);
 
-        $session = $response->getSession();
-
-        $this->assertEquals(
-            'You already have a Github account linked.',
-            $session->get('social')
-        );
+        $this->assertNull(session('hej_github_1'));
 
         $this->assertCount(
             1, $user->socials()->get()
         );
+
 
         $this->assertCount(1, User::all());
 
@@ -304,6 +294,46 @@ class ProviderTest extends TestCase
 
         $this->assertCount(
             0, $user->socials()->get()
+        );
+    }
+
+    public function test_link_already_linked_social_account_by_same_user()
+    {
+        $user = factory(User::class)->create(['email' => 'test@test.com']);
+
+        $this
+            ->actingAs($user)
+            ->call('GET', route('link', ['provider' => 'github']))
+            ->assertStatus(302);
+
+        $this->assertEquals(
+            1,
+            session('hej_github_1')
+        );
+
+        $this->mockSocialiteFacade(
+            \Laravel\Socialite\Two\GithubProvider::class
+        );
+
+        $this->assertCount(
+            0, $user->socials()->get()
+        );
+
+        $user->socials()->create([
+            'provider' => 'github',
+            'provider_id' => '123',
+        ]);
+
+        // Calling it again wont link it.
+        $response = $this
+            ->call('GET', route('callback', ['provider' => 'github']))
+            ->assertRedirectedToRoute('home');
+
+        $session = $response->getSession();
+
+        $this->assertEquals(
+            'You already have a Github account linked.',
+            $session->get('social')
         );
     }
 }
