@@ -33,6 +33,58 @@ trait HandlesSocialRequests
     }
 
     /**
+     * Redirect to link a social account
+     * for the current authenticated user.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  string  $provider
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function link(Request $request, string $provider)
+    {
+        if ($this->rejectProvider($provider)) {
+            return $this->providerRejected($request, $provider);
+        }
+
+        $model = $request->user();
+
+        if ($model->hasSocial($provider)) {
+            return $this->providerAlreadyLinked($request, $provider, $model);
+        }
+
+        $sessionKey = $this->getLinkSessionKey($request, $provider, $model);
+
+        session()->put($sessionKey, $model->getKey());
+
+        return $this->getSocialiteRedirect($request, $provider);
+    }
+
+    /**
+     * Try to unlink a social account
+     * for the current authenticated user.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  string  $provider
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function unlink(Request $request, string $provider)
+    {
+        if ($this->rejectProvider($provider)) {
+            return $this->providerRejected($request, $provider);
+        }
+
+        $model = $request->user();
+
+        if ($social = $model->getSocial($provider)) {
+            $social->delete();
+        }
+
+        $this->unlinked($request, $model, $provider);
+
+        return $this->redirectAfterUnlink($request, $model, $provider);
+    }
+
+    /**
      * Process the user callback.
      *
      * @param  \Illuminate\Http\Request  $request
@@ -47,14 +99,22 @@ trait HandlesSocialRequests
 
         $providerUser = $this->getSocialiteUser($request, $provider);
 
+        // If the user tried to link the account, handle different logic.
+
+        $sessionKey = $this->getLinkSessionKey($request, $provider, $request->user());
+
+        if ($authenticatableKey = session()->pull($sessionKey)) {
+            return $this->linkCallback($request, $provider, $authenticatableKey, $providerUser);
+        }
+
         // If the Social is attached to any authenticatable model,
         // then jump off and login.
 
-        if ($model = $this->getModelBySocialId($provider, $providerUser->getId())) {
+        if ($model = $this->getModelBySocialId($request->user(), $provider, $providerUser->getId())) {
             $social = $this->updateSocialInstance($request, $provider, $model, $providerUser);
 
             $this->authenticated(
-                $model, $social, $providerUser
+                $request, $model, $social, $providerUser
             );
 
             return $this->authenticateModel($model);
@@ -82,38 +142,91 @@ trait HandlesSocialRequests
 
         $social = $this->updateSocialInstance($request, $social, $model, $providerUser);
 
-        $this->registered($model, $social, $providerUser);
+        $this->registered($request, $model, $social, $providerUser);
 
         return $this->authenticateModel($model);
     }
 
     /**
+     * Handle the link callback to attach to an authenticatable ID.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  string  $provider
+     * @param  string  $authenticatableId
+     * @param  \Laravel\Socialite\AbstractUser  $providerUser
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    protected function linkCallback(Request $request, string $provider, string $authenticatableId, $providerUser)
+    {
+        $authenticatableModel = $this->getAuthenticatable($request, $provider);
+
+        $model = $authenticatableModel::find($authenticatableId);
+
+        // Check if user has already a Social account with the provider.
+
+        if ($model->hasSocial($provider)) {
+            return $this->providerAlreadyLinked(
+                $request, $provider, $model, $providerUser
+            );
+        }
+
+        // Make sure that there are not two same authenticatables
+        // that are linked to same social account.
+
+        if ($this->getSocialById($model, $provider, $providerUser->getId())) {
+            return $this->providerAlreadyLinkedByAnotherAuthenticatable(
+                $request, $provider, $model, $providerUser
+            );
+        }
+
+        $social = $model->socials()->create([
+            'provider' => $provider,
+            'provider_id' => $providerUser->getId(),
+        ]);
+
+        $social = $this->updateSocialInstance(
+            $request, $social, $model, $providerUser
+        );
+
+        $this->linked($request, $model, $social, $providerUser);
+
+        return $this->redirectAfterLink(
+            $request, $model, $social, $providerUser
+        );
+    }
+
+    /**
      * Get the user by using a social provider's ID.
      *
+     * @param  \Illuminate\Database\Eloquent\Model  $model
      * @param  string  $provider
      * @param  mixed  $id
      * @return null|\Illuminate\Eloquent\Database\Model
      */
-    protected function getModelBySocialId(string $provider, $id)
+    protected function getModelBySocialId($model, string $provider, $id)
     {
-        $social = $this->getSocialById($provider, $id);
+        $social = $this->getSocialById($model, $provider, $id);
 
-        return $social ? $social->model : null;
+        return $social ? $model : null;
     }
 
     /**
      * Get a Social instance by Social and ID.
      *
+     * @param  \Illuminate\Database\Eloquent\Model  $model
      * @param  string  $provider
      * @param  mixed  $id
      * @return \Illuminate\Database\Eloquent\Model|null
      */
-    protected function getSocialById(string $provider, $id)
+    protected function getSocialById($model, string $provider, $id)
     {
         $socialModel = config('hej.models.social');
 
         return $socialModel::whereProvider($provider)
             ->whereProviderId($id)
+            ->when($model, function ($query, $model) {
+                return $query->whereModelType($model->getMorphClass());
+            })
             ->first();
     }
 
@@ -151,7 +264,7 @@ trait HandlesSocialRequests
     {
         $social = $provider instanceof Social
             ? $provider
-            : $this->getSocialById($provider, $providerUser->getId());
+            : $this->getSocialById($model, $provider, $providerUser->getId());
 
         if (! $social) {
             return false;
