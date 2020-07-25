@@ -190,7 +190,6 @@ class ProviderTest extends TestCase
             1, $user->socials()->get()
         );
 
-
         $this->assertCount(1, User::all());
 
         $social = $user->socials()->first();
