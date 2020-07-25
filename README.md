@@ -1,4 +1,4 @@
-**Hej**! - a Socialite authentication flow boilerplate
+Hej! - a Socialite authentication flow boilerplate
 ==================================================
 
 ![](images/hej.png)
