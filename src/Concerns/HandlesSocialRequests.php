@@ -79,7 +79,7 @@ trait HandlesSocialRequests
             $social->delete();
         }
 
-        $this->unlinked($model, $provider);
+        $this->unlinked($request, $model, $provider);
 
         return $this->redirectAfterUnlink($request, $model, $provider);
     }
@@ -114,7 +114,7 @@ trait HandlesSocialRequests
             $social = $this->updateSocialInstance($request, $provider, $model, $providerUser);
 
             $this->authenticated(
-                $model, $social, $providerUser
+                $request, $model, $social, $providerUser
             );
 
             return $this->authenticateModel($model);
@@ -142,7 +142,7 @@ trait HandlesSocialRequests
 
         $social = $this->updateSocialInstance($request, $social, $model, $providerUser);
 
-        $this->registered($model, $social, $providerUser);
+        $this->registered($request, $model, $social, $providerUser);
 
         return $this->authenticateModel($model);
     }
@@ -188,7 +188,7 @@ trait HandlesSocialRequests
             $request, $social, $model, $providerUser
         );
 
-        $this->linked($model, $social, $providerUser);
+        $this->linked($request, $model, $social, $providerUser);
 
         return $this->redirectAfterLink(
             $request, $model, $social, $providerUser

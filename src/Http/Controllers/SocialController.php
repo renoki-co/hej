@@ -264,12 +264,13 @@ class SocialController extends Controller
     /**
      * Handle the callback after the registration process.
      *
+     * @param  \Illuminate\Http\Request  $request
      * @param  \Illuminate\Database\Eloquent\Model  $model
      * @param  \Illuminate\Database\Eloquent\Model  $social
      * @param  \Laravel\Socialite\AbstractUser  $providerUser
      * @return void
      */
-    protected function registered($model, $social, $providerUser)
+    protected function registered(Request $request, $model, $social, $providerUser)
     {
         //
     }
@@ -277,12 +278,13 @@ class SocialController extends Controller
     /**
      * Handle the callback after the login process.
      *
+     * @param  \Illuminate\Http\Request  $request
      * @param  \Illuminate\Database\Eloquent\Model  $model
      * @param  \Illuminate\Database\Eloquent\Model  $social
      * @param  \Laravel\Socialite\AbstractUser  $providerUser
      * @return void
      */
-    protected function authenticated($model, $social, $providerUser)
+    protected function authenticated(Request $request, $model, $social, $providerUser)
     {
         //
     }
@@ -290,12 +292,13 @@ class SocialController extends Controller
     /**
      * Handle the callback after the linking process.
      *
+     * @param  \Illuminate\Http\Request  $request
      * @param  \Illuminate\Database\Eloquent\Model  $model
      * @param  \Illuminate\Database\Eloquent\Model  $social
      * @param  \Laravel\Socialite\AbstractUser  $providerUser
      * @return void
      */
-    protected function linked($model, $social, $providerUser)
+    protected function linked(Request $request, $model, $social, $providerUser)
     {
         //
     }
@@ -303,11 +306,12 @@ class SocialController extends Controller
     /**
      * Handle the callback after the unlink process.
      *
+     * @param  \Illuminate\Http\Request  $request
      * @param  \Illuminate\Database\Eloquent\Model  $model
      * @param  string  $provider
      * @return void
      */
-    protected function unlinked($model, string $provider)
+    protected function unlinked(Request $request, $model, string $provider)
     {
         //
     }
