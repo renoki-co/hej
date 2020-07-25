@@ -26,7 +26,8 @@ class ProviderTest extends TestCase
             \Laravel\Socialite\Two\GithubProvider::class
         );
 
-        $this->call('GET', route('callback', ['provider' => 'github']))
+        $this
+            ->call('GET', route('callback', ['provider' => 'github']))
             ->assertStatus(302);
 
         $this->assertNotNull(
@@ -34,10 +35,10 @@ class ProviderTest extends TestCase
         );
 
         $this->assertCount(
-            1, $user->socials
+            1, $user->socials()->get()
         );
 
-        $social = $user->socials->first();
+        $social = $user->socials()->first();
 
         $expected = [
             'id' => 1,
@@ -78,10 +79,12 @@ class ProviderTest extends TestCase
             \Laravel\Socialite\Two\GithubProvider::class
         );
 
-        $this->call('GET', route('callback', ['provider' => 'github']))
+        $this
+            ->call('GET', route('callback', ['provider' => 'github']))
             ->assertStatus(302);
 
-        $this->call('GET', route('callback', ['provider' => 'github']))
+        $this
+            ->call('GET', route('callback', ['provider' => 'github']))
             ->assertStatus(302);
 
         $this->assertNotNull(
@@ -89,10 +92,10 @@ class ProviderTest extends TestCase
         );
 
         $this->assertCount(
-            1, $user->socials
+            1, $user->socials()->get()
         );
 
-        $social = $user->socials->first();
+        $social = $user->socials()->first();
 
         $expected = [
             'id' => 1,

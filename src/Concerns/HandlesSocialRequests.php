@@ -50,7 +50,7 @@ trait HandlesSocialRequests
         // If the Social is attached to any authenticatable model,
         // then jump off and login.
 
-        if ($model = $this->getModelBySocialId($provider, $providerUser->getId())) {
+        if ($model = $this->getModelBySocialId($request->user(), $provider, $providerUser->getId())) {
             $social = $this->updateSocialInstance($request, $provider, $model, $providerUser);
 
             $this->authenticated(
@@ -90,30 +90,35 @@ trait HandlesSocialRequests
     /**
      * Get the user by using a social provider's ID.
      *
+     * @param  \Illuminate\Database\Eloquent\Model  $model
      * @param  string  $provider
      * @param  mixed  $id
      * @return null|\Illuminate\Eloquent\Database\Model
      */
-    protected function getModelBySocialId(string $provider, $id)
+    protected function getModelBySocialId($model, string $provider, $id)
     {
-        $social = $this->getSocialById($provider, $id);
+        $social = $this->getSocialById($model, $provider, $id);
 
-        return $social ? $social->model : null;
+        return $social ? $model : null;
     }
 
     /**
      * Get a Social instance by Social and ID.
      *
+     * @param  \Illuminate\Database\Eloquent\Model  $model
      * @param  string  $provider
      * @param  mixed  $id
      * @return \Illuminate\Database\Eloquent\Model|null
      */
-    protected function getSocialById(string $provider, $id)
+    protected function getSocialById($model, string $provider, $id)
     {
         $socialModel = config('hej.models.social');
 
         return $socialModel::whereProvider($provider)
             ->whereProviderId($id)
+            ->when($model, function ($query, $model) {
+                return $query->whereModelType($model->getMorphClass());
+            })
             ->first();
     }
 
@@ -151,7 +156,7 @@ trait HandlesSocialRequests
     {
         $social = $provider instanceof Social
             ? $provider
-            : $this->getSocialById($provider, $providerUser->getId());
+            : $this->getSocialById($model, $provider, $providerUser->getId());
 
         if (! $social) {
             return false;
