@@ -180,11 +180,22 @@ class ProviderTest extends TestCase
             0, $user->socials()->get()
         );
 
-        $this
-            ->call('GET', route('callback', ['provider' => 'github']))
-            ->assertStatus(302);
+        $user->socials()->create([
+            'provider' => 'github',
+            'provider_id' => '123',
+        ]);
 
-        $this->assertNull(session('hej_github_1'));
+        // Calling it again wont link it again.
+        $response = $this
+            ->call('GET', route('callback', ['provider' => 'github']))
+            ->assertRedirectedToRoute('home');
+
+        $session = $response->getSession();
+
+        $this->assertEquals(
+            'You already have a Github account linked.',
+            $session->get('social')
+        );
 
         $this->assertCount(
             1, $user->socials()->get()
@@ -260,7 +271,7 @@ class ProviderTest extends TestCase
 
         $this->assertEquals(
             'Your Github account is already linked to another account.',
-            session('social')
+            $session->get('social')
         );
     }
 
