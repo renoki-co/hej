@@ -49,7 +49,9 @@ trait HandlesSocialRequests
         $model = $request->user();
 
         if ($model->hasSocial($provider)) {
-            return $this->providerAlreadyLinked($request, $provider, $model);
+            return $this->providerAlreadyLinked(
+                $request, $provider, $model
+            );
         }
 
         $sessionKey = $this->getLinkSessionKey($request, $provider, $model);
@@ -166,7 +168,7 @@ trait HandlesSocialRequests
 
         if ($model->hasSocial($provider)) {
             return $this->providerAlreadyLinked(
-                $request, $provider, $model, $providerUser
+                $request, $provider, $model
             );
         }
 

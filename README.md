@@ -201,10 +201,9 @@ Additionally, you may implement custom redirect for various events happening dur
  * @param  \Illuminate\Http\Request  $request
  * @param  string  $provider
  * @param  \Illuminate\Database\Eloquent\Model  $model
- * @param  \Laravel\Socialite\AbstractUser  $providerUser
  * @return \Illuminate\Http\RedirectResponse
  */
-protected function providerAlreadyLinked(Request $request, $provider, $model, $providerUser)
+protected function providerAlreadyLinked(Request $request, $provider, $model)
 {
     $provider = ucfirst($provider);
 
