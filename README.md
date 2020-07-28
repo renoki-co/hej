@@ -1,5 +1,5 @@
-Hej! - a Socialite authentication flow boilerplate
-==================================================
+Hej! - a Socialite authentication flow implementation
+=====================================================
 
 ![](images/hej.png)
 
@@ -11,9 +11,7 @@ Hej! - a Socialite authentication flow boilerplate
 [![Monthly Downloads](https://poser.pugx.org/renoki-co/hej/d/monthly)](https://packagist.org/packages/renoki-co/hej)
 [![License](https://poser.pugx.org/renoki-co/hej/license)](https://packagist.org/packages/renoki-co/hej)
 
-Hej! is a simple authentication boilerplate for Socialite. It helps you handle the logic so you won't have to do it each and every time for all your projects.
-
-Hej! comes pre-packages with migrations and a controller that you can modify to customize your needs.
+Hej! is a simple authentication flow implementation for Socialite. Out-of-the-box, Hej! can help you login and register users using Socialite providers, or link and unlink social accounts, just by extending a controller.
 
 ## 🤝 Supporting
 
