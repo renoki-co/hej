@@ -437,11 +437,6 @@ protected function getSocialData(Request $request, string $provider, $model, $pr
         'provider_name' => $providerUser->getName(),
         'provider_email' => $providerUser->getEmail(),
         'provider_avatar' => $providerUser->getAvatar(),
-        'token' => $providerUser->token,
-        'token_secret' => $providerUser->tokenSecret ?? null,
-        'refresh_token' => $providerUser->refreshToken ?? null,
-        'token_expires_at' => isset($providerUser->expiresIn) ? now()->addSeconds($providerUser->expiresIn) : null,
-        'provider_data' => $providerUser->getRaw(),
     ];
 }
 ```

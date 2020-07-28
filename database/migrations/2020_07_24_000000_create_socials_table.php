@@ -22,11 +22,6 @@ class CreateSocialsTable extends Migration
             $table->string('provider_name')->nullable();
             $table->string('provider_email')->nullable();
             $table->string('provider_avatar')->nullable();
-            $table->json('provider_data')->nullable();
-            $table->string('token')->nullable();
-            $table->string('token_secret')->nullable();
-            $table->string('refresh_token')->nullable();
-            $table->timestamp('token_expires_at')->nullable();
             $table->timestamps();
 
             $table->index(['model_id', 'model_type']);
