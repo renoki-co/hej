@@ -58,18 +58,6 @@ class ProviderTest extends TestCase
             'provider_name' => 'rennokki',
             'provider_email' => 'test@test.com',
             'provider_avatar' => 'https://avatars2.githubusercontent.com/u/21983456?v=4',
-            'provider_data' => [
-                'login' => 'rennokki',
-                'id' => 1234,
-                'avatar_url' => 'https://avatars2.githubusercontent.com/u/21983456?v=4',
-                'url' => 'https://api.github.com/users/rennokki',
-                'email' => 'test@test.com',
-                'name' => 'rennokki',
-            ],
-            'token' => 'token_123',
-            'token_secret' => null,
-            'refresh_token' => null,
-            'token_expires_at' => null,
         ];
 
         $existingData = $social->setHidden([])->toArray();
@@ -115,18 +103,6 @@ class ProviderTest extends TestCase
             'provider_name' => 'rennokki',
             'provider_email' => 'test@test.com',
             'provider_avatar' => 'https://avatars2.githubusercontent.com/u/21983456?v=4',
-            'provider_data' => [
-                'login' => 'rennokki',
-                'id' => 1234,
-                'avatar_url' => 'https://avatars2.githubusercontent.com/u/21983456?v=4',
-                'url' => 'https://api.github.com/users/rennokki',
-                'email' => 'test@test.com',
-                'name' => 'rennokki',
-            ],
-            'token' => 'token_123',
-            'token_secret' => null,
-            'refresh_token' => null,
-            'token_expires_at' => null,
         ];
 
         $existingData = $social->setHidden([])->toArray();
@@ -204,18 +180,6 @@ class ProviderTest extends TestCase
             'provider_name' => 'rennokki',
             'provider_email' => 'test@test.com',
             'provider_avatar' => 'https://avatars2.githubusercontent.com/u/21983456?v=4',
-            'provider_data' => [
-                'login' => 'rennokki',
-                'id' => 1234,
-                'avatar_url' => 'https://avatars2.githubusercontent.com/u/21983456?v=4',
-                'url' => 'https://api.github.com/users/rennokki',
-                'email' => 'test@test.com',
-                'name' => 'rennokki',
-            ],
-            'token' => 'token_123',
-            'token_secret' => null,
-            'refresh_token' => null,
-            'token_expires_at' => null,
         ];
 
         $existingData = $social->setHidden([])->toArray();
