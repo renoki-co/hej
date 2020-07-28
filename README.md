@@ -176,26 +176,6 @@ protected function getSocialiteUser(Request $request, string $provider)
 }
 ```
 
-For example, wanting to generate the redirect and get the user within an API can be done:
-
-```php
-protected function getSocialiteRedirect(Request $request, string $provider)
-{
-    return $this->socialite
-        ->driver($provider)
-        ->stateless()
-        ->redirect();
-}
-
-protected function getSocialiteUser(Request $request, string $provider)
-{
-    return $this->socialite
-        ->driver($provider)
-        ->stateless()
-        ->user();
-}
-```
-
 ## Link & Unlink
 
 Prior to creating new accounts or logging in with Socialite providers, Hej! comes with support to link and unlink Social accounts to and from your users.
