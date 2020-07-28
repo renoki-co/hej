@@ -16,13 +16,6 @@ class Social extends Model
     ];
 
     /**
-     * {@inheritdoc}
-     */
-    protected $casts = [
-        'provider_data' => 'array',
-    ];
-
-    /**
      * Get the model that uses this Social instance.
      *
      * @return mixed
