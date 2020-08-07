@@ -60,7 +60,7 @@ Out-of-the-box, it works with any Laravel application.
 After you have configured Socialite, the only thing to do is to point your desired redirect and callback paths to the package controller:
 
 ```php
-Route::get('/social/{provider}/redirect', 'RenokiCo\Hej\Http\Controllers\SocialController@redirect')
+Route::get('/social/{provider}/redirect', 'RenokiCo\Hej\Http\Controllers\SocialController@redirect');
 Route::get('/social/{provider}/callback', 'RenokiCo\Hej\Http\Controllers\SocialController@callback');
 
 Route::get('/social/{provider}/link', 'RenokiCo\Hej\Http\Controllers\SocialController@link')
