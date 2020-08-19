@@ -272,7 +272,7 @@ trait HandlesSocialRequests
 
         $social->update(
             $this->getSocialData(
-                $request, $provider, $model, $providerUser,
+                $request, $provider, $model, $providerUser
             )
         );
 
