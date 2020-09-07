@@ -14,7 +14,7 @@ class CreateSocialsTable extends Migration
     public function up()
     {
         Schema::create('socials', function (Blueprint $table) {
-            $table->id();
+            $table->bigIncrements('id');
             $table->morphs('model');
             $table->string('provider');
             $table->string('provider_id');
