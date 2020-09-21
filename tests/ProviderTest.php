@@ -8,23 +8,19 @@ class ProviderTest extends TestCase
 {
     public function test_redirect_should_redirect_to_provider_website()
     {
-        $this
-            ->call('GET', route('redirect', ['provider' => 'github']))
+        $this->call('GET', route('redirect', ['provider' => 'github']))
             ->assertStatus(302);
     }
 
     public function test_should_not_redirect_or_callback_for_unwhitelisted_providers()
     {
-        $this
-            ->call('GET', route('redirect', ['provider' => 'facebook']))
+        $this->call('GET', route('redirect', ['provider' => 'facebook']))
             ->assertRedirectedToRoute('home');
 
-        $this
-            ->call('GET', route('callback', ['provider' => 'facebook']))
+        $this->call('GET', route('callback', ['provider' => 'facebook']))
             ->assertRedirectedToRoute('home');
 
-        $this
-            ->call('GET', route('unlink', ['provider' => 'facebook']))
+        $this->call('GET', route('unlink', ['provider' => 'facebook']))
             ->assertRedirectedToRoute('home');
     }
 
@@ -34,17 +30,14 @@ class ProviderTest extends TestCase
             \Laravel\Socialite\Two\GithubProvider::class
         );
 
-        $this
-            ->call('GET', route('callback', ['provider' => 'github']))
+        $this->call('GET', route('callback', ['provider' => 'github']))
             ->assertStatus(302);
 
         $this->assertNotNull(
             $user = User::whereEmail('test@test.com')->first()
         );
 
-        $this->assertCount(
-            1, $user->socials()->get()
-        );
+        $this->assertCount(1, $user->socials()->get());
 
         $social = $user->socials()->first();
 
@@ -75,21 +68,17 @@ class ProviderTest extends TestCase
             \Laravel\Socialite\Two\GithubProvider::class
         );
 
-        $this
-            ->call('GET', route('callback', ['provider' => 'github']))
+        $this->call('GET', route('callback', ['provider' => 'github']))
             ->assertStatus(302);
 
-        $this
-            ->call('GET', route('callback', ['provider' => 'github']))
+        $this->call('GET', route('callback', ['provider' => 'github']))
             ->assertStatus(302);
 
         $this->assertNotNull(
             $user = User::whereEmail('test@test.com')->first()
         );
 
-        $this->assertCount(
-            1, $user->socials()->get()
-        );
+        $this->assertCount(1, $user->socials()->get());
 
         $social = $user->socials()->first();
 
@@ -138,15 +127,11 @@ class ProviderTest extends TestCase
     {
         $user = factory(User::class)->create(['email' => 'test@test.com']);
 
-        $this
-            ->actingAs($user)
+        $this->actingAs($user)
             ->call('GET', route('link', ['provider' => 'github']))
             ->assertStatus(302);
 
-        $this->assertEquals(
-            1,
-            session('hej_github_1')
-        );
+        $this->assertEquals(1, session('hej_github_1'));
 
         $this->mockSocialiteFacade(
             \Laravel\Socialite\Two\GithubProvider::class
@@ -156,15 +141,12 @@ class ProviderTest extends TestCase
             0, $user->socials()->get()
         );
 
-        $this
-            ->call('GET', route('callback', ['provider' => 'github']))
+        $this->call('GET', route('callback', ['provider' => 'github']))
             ->assertStatus(302);
 
         $this->assertNull(session('hej_github_1'));
 
-        $this->assertCount(
-            1, $user->socials()->get()
-        );
+        $this->assertCount(1, $user->socials()->get());
 
         $this->assertCount(1, User::all());
 
@@ -196,13 +178,11 @@ class ProviderTest extends TestCase
         $user = factory(User::class)->create(['email' => 'test@test.com']);
         $user2 = factory(User::class)->create(['email' => 'test2@test.com']);
 
-        $this
-            ->actingAs($user)
+        $this->actingAs($user)
             ->call('GET', route('link', ['provider' => 'github']))
             ->assertStatus(302);
 
-        $this
-            ->actingAs($user2)
+        $this->actingAs($user2)
             ->call('GET', route('link', ['provider' => 'github']))
             ->assertStatus(302);
 
@@ -210,13 +190,11 @@ class ProviderTest extends TestCase
             \Laravel\Socialite\Two\GithubProvider::class
         );
 
-        $this
-            ->actingAs($user)
+        $this->actingAs($user)
             ->call('GET', route('callback', ['provider' => 'github']))
             ->assertStatus(302);
 
-        $response = $this
-            ->actingAs($user2)
+        $response = $this->actingAs($user2)
             ->call('GET', route('callback', ['provider' => 'github']))
             ->assertRedirectedToRoute('home');
 
@@ -232,8 +210,7 @@ class ProviderTest extends TestCase
     {
         $user = factory(User::class)->create(['email' => 'test@test.com']);
 
-        $this
-            ->actingAs($user)
+        $this->actingAs($user)
             ->call('GET', route('link', ['provider' => 'github']))
             ->assertStatus(302);
 
@@ -241,38 +218,28 @@ class ProviderTest extends TestCase
             \Laravel\Socialite\Two\GithubProvider::class
         );
 
-        $this
-            ->actingAs($user)
+        $this->actingAs($user)
             ->call('GET', route('callback', ['provider' => 'github']))
             ->assertStatus(302);
 
-        $this->assertCount(
-            1, $user->socials()->get()
-        );
+        $this->assertCount(1, $user->socials()->get());
 
-        $this
-            ->actingAs($user)
+        $this->actingAs($user)
             ->call('GET', route('unlink', ['provider' => 'github']))
             ->assertStatus(302);
 
-        $this->assertCount(
-            0, $user->socials()->get()
-        );
+        $this->assertCount(0, $user->socials()->get());
     }
 
     public function test_link_already_linked_social_account_by_same_user()
     {
         $user = factory(User::class)->create(['email' => 'test@test.com']);
 
-        $this
-            ->actingAs($user)
+        $this->actingAs($user)
             ->call('GET', route('link', ['provider' => 'github']))
             ->assertStatus(302);
 
-        $this->assertEquals(
-            1,
-            session('hej_github_1')
-        );
+        $this->assertEquals(1, session('hej_github_1'));
 
         $this->mockSocialiteFacade(
             \Laravel\Socialite\Two\GithubProvider::class
@@ -288,8 +255,7 @@ class ProviderTest extends TestCase
         ]);
 
         // Calling it again wont link it.
-        $response = $this
-            ->call('GET', route('callback', ['provider' => 'github']))
+        $response = $this->call('GET', route('callback', ['provider' => 'github']))
             ->assertRedirectedToRoute('home');
 
         $session = $response->getSession();
