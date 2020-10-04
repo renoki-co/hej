@@ -6,6 +6,7 @@ use Auth;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Redirect;
 use Laravel\Socialite\Contracts\Factory as Socialite;
 use RenokiCo\Hej\Concerns\HandlesSocialRequests;
 use Str;
@@ -138,7 +139,7 @@ class SocialController extends Controller
 
         session()->flash('social', 'Welcome back in your account!');
 
-        return redirect(route('home'));
+        return Redirect::route('home');
     }
 
     /**
@@ -154,7 +155,7 @@ class SocialController extends Controller
 
         session()->flash('social', "The authentication with {$provider} failed!");
 
-        return redirect(route('home'));
+        return Redirect::route('home');
     }
 
     /**
@@ -174,7 +175,7 @@ class SocialController extends Controller
             'social', "The E-Mail address associated with your {$provider} account is already used."
         );
 
-        return redirect(route('register'));
+        return Redirect::route('register');
     }
 
     /**
@@ -195,7 +196,7 @@ class SocialController extends Controller
             'social', "You already have a {$provider} account linked."
         );
 
-        return redirect(route('home'));
+        return Redirect::route('home');
     }
 
     /**
@@ -216,7 +217,7 @@ class SocialController extends Controller
             'social', "Your {$provider} account is already linked to another account."
         );
 
-        return redirect(route('home'));
+        return Redirect::route('home');
     }
 
     /**
@@ -234,7 +235,7 @@ class SocialController extends Controller
 
         session()->flash('social', "The {$provider} account has been linked to your account.");
 
-        return redirect(route('home'));
+        return Redirect::route('home');
     }
 
     /**
@@ -251,7 +252,7 @@ class SocialController extends Controller
 
         session()->flash('social', "The {$provider} account has been unlinked.");
 
-        return redirect(route('home'));
+        return Redirect::route('home');
     }
 
     /**
