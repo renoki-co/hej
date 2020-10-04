@@ -119,6 +119,9 @@ protected static $allowedSocialiteProviders = [
 If one of the providers accessed via the URL is not whitelisted, a simple redirect is done automatically. However, you can replace it and redirect to your custom path:
 
 ```php
+use Illuminate\Support\Facades\Redirect;
+use Illuminate\Support\Facades\Session;
+
 /**
  * Handle the callback when a provider gets rejected.
  *
@@ -130,9 +133,9 @@ protected function providerRejected(Request $request, $provider)
 {
     $provider = ucfirst($provider);
 
-    session()->flash('social', "The authentication with {$provider} failed!");
+    Session::flash('social', "The authentication with {$provider} failed!");
 
-    return redirect(route('home'));
+    return Redirect::route('home');
 }
 ```
 
@@ -143,6 +146,7 @@ With Socialite, you can use `->redirect()` to redirect the user and `->user()` t
 Here is the default configuration:
 
 ```php
+
 /**
  * Get the Socialite direct instance that will redirect
  * the user to the right provider OAuth page.
@@ -193,6 +197,9 @@ Further, you may access the URLs to link or unlink providers.
 Additionally, you may implement custom redirect for various events happening during link/unlink:
 
 ```php
+use Illuminate\Support\Facades\Redirect;
+use Illuminate\Support\Facades\Session;
+
 /**
  * Handle the callback when the user tries
  * to link a social account when it
@@ -207,11 +214,11 @@ protected function providerAlreadyLinked(Request $request, $provider, $model)
 {
     $provider = ucfirst($provider);
 
-    session()->flash(
+    Session::flash(
         'social', "You already have a {$provider} account linked."
     );
 
-    return redirect(route('home'));
+    return Redirect::route('home');
 }
 
 /**
@@ -228,11 +235,11 @@ protected function providerAlreadyLinkedByAnotherAuthenticatable(Request $reques
 {
     $provider = ucfirst($provider);
 
-    session()->flash(
+    Session::flash(
         'social', "Your {$provider} account is already linked to another account."
     );
 
-    return redirect(route('home'));
+    return Redirect::route('home');
 }
 
 /**
@@ -248,9 +255,9 @@ protected function redirectAfterLink(Request $request, $model, $social, $provide
 {
     $provider = ucfirst($social->provider);
 
-    session()->flash('social', "The {$provider} account has been linked to your account.");
+    Session::flash('social', "The {$provider} account has been linked to your account.");
 
-    return redirect(route('home'));
+    return Redirect::route('home');
 }
 
 /**
@@ -265,9 +272,9 @@ protected function redirectAfterUnlink(Request $request, $model, string $provide
 {
     $provider = ucfirst($provider);
 
-    session()->flash('social', "The {$provider} account has been unlinked.");
+    Session::flash('social', "The {$provider} account has been unlinked.");
 
-    return redirect(route('home'));
+    return Redirect::route('home');
 }
 ```
 
@@ -370,6 +377,9 @@ Sometimes, it can happen for the users to have an account created with E-Mail ad
 Hej! addresses this issue by checking for duplicated E-Mail address. You may handle the redirection within `duplicateEmail`:
 
 ```php
+use Illuminate\Support\Facades\Redirect;
+use Illuminate\Support\Facades\Session;
+
 /**
  * Handle the callback when the user's social account
  * E-Mail address is already used.
@@ -383,11 +393,11 @@ protected function duplicateEmail(Request $request, $provider, $providerUser)
 {
     $provider = ucfirst($provider);
 
-    session()->flash(
+    Session::flash(
         'social', "The E-Mail address associated with your {$provider} account is already used."
     );
 
-    return redirect(route('register'));
+    return Redirect::route('register');
 }
 ```
 
@@ -425,6 +435,9 @@ After the business authentication logic finished, it's time to authenticate the 
 This is how the default method looks like:
 
 ```php
+use Illuminate\Support\Facades\Redirect;
+use Illuminate\Support\Facades\Session;
+
 /**
  * Handle the user login and redirection.
  *
@@ -435,9 +448,9 @@ protected function authenticateModel($model)
 {
     Auth::login($model);
 
-    session()->flash('social', 'Welcome back in your account!');
+    Session::flash('social', 'Welcome back in your account!');
 
-    return redirect(route('home'));
+    return Redirect::route('home');
 }
 ```
 

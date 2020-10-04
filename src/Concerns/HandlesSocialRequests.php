@@ -3,6 +3,7 @@
 namespace RenokiCo\Hej\Concerns;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Session;
 use RenokiCo\Hej\Social;
 
 trait HandlesSocialRequests
@@ -56,7 +57,7 @@ trait HandlesSocialRequests
 
         $sessionKey = $this->getLinkSessionKey($request, $provider, $model);
 
-        session()->put($sessionKey, $model->getKey());
+        Session::put($sessionKey, $model->getKey());
 
         return $this->getSocialiteRedirect($request, $provider);
     }
@@ -105,7 +106,7 @@ trait HandlesSocialRequests
 
         $sessionKey = $this->getLinkSessionKey($request, $provider, $request->user());
 
-        if ($authenticatableKey = session()->pull($sessionKey)) {
+        if ($authenticatableKey = Session::pull($sessionKey)) {
             return $this->linkCallback($request, $provider, $authenticatableKey, $providerUser);
         }
 

@@ -6,6 +6,8 @@ use Auth;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Redirect;
+use Illuminate\Support\Facades\Session;
 use Laravel\Socialite\Contracts\Factory as Socialite;
 use RenokiCo\Hej\Concerns\HandlesSocialRequests;
 use Str;
@@ -136,9 +138,9 @@ class SocialController extends Controller
     {
         Auth::login($model);
 
-        session()->flash('social', 'Welcome back in your account!');
+        Session::flash('social', 'Welcome back in your account!');
 
-        return redirect(route('home'));
+        return Redirect::route('home');
     }
 
     /**
@@ -152,9 +154,9 @@ class SocialController extends Controller
     {
         $provider = ucfirst($provider);
 
-        session()->flash('social', "The authentication with {$provider} failed!");
+        Session::flash('social', "The authentication with {$provider} failed!");
 
-        return redirect(route('home'));
+        return Redirect::route('home');
     }
 
     /**
@@ -170,11 +172,11 @@ class SocialController extends Controller
     {
         $provider = ucfirst($provider);
 
-        session()->flash(
+        Session::flash(
             'social', "The E-Mail address associated with your {$provider} account is already used."
         );
 
-        return redirect(route('register'));
+        return Redirect::route('register');
     }
 
     /**
@@ -191,11 +193,11 @@ class SocialController extends Controller
     {
         $provider = ucfirst($provider);
 
-        session()->flash(
+        Session::flash(
             'social', "You already have a {$provider} account linked."
         );
 
-        return redirect(route('home'));
+        return Redirect::route('home');
     }
 
     /**
@@ -212,11 +214,11 @@ class SocialController extends Controller
     {
         $provider = ucfirst($provider);
 
-        session()->flash(
+        Session::flash(
             'social', "Your {$provider} account is already linked to another account."
         );
 
-        return redirect(route('home'));
+        return Redirect::route('home');
     }
 
     /**
@@ -232,9 +234,9 @@ class SocialController extends Controller
     {
         $provider = ucfirst($social->provider);
 
-        session()->flash('social', "The {$provider} account has been linked to your account.");
+        Session::flash('social', "The {$provider} account has been linked to your account.");
 
-        return redirect(route('home'));
+        return Redirect::route('home');
     }
 
     /**
@@ -249,9 +251,9 @@ class SocialController extends Controller
     {
         $provider = ucfirst($provider);
 
-        session()->flash('social', "The {$provider} account has been unlinked.");
+        Session::flash('social', "The {$provider} account has been unlinked.");
 
-        return redirect(route('home'));
+        return Redirect::route('home');
     }
 
     /**
