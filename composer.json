@@ -2,7 +2,7 @@
     "name": "renoki-co/hej",
     "description": "Hej! is a simple authentication boilerplate for Socialite.",
     "keywords": ["laravel", "php", "social", "login", "register", "socialite", "facebook", "github", "twitter", "gitlab", "google"],
-    "license": "MIT",
+    "license": "Apache-2.0",
     "homepage": "https://github.com/renoki-co/hej",
     "authors": [
         {
