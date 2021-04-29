@@ -116,7 +116,7 @@ class ProviderTest extends TestCase
         $this->assertCount(0, $user->socials()->get());
 
         $this->call('GET', route('callback', ['provider' => 'github']))
-            ->assertRedirectedToRoute('register');
+            ->assertRedirectedToRoute('home');
 
         $this->assertCount(0, $user->socials()->get());
 
