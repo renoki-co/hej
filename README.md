@@ -13,6 +13,25 @@ Hej! - a Socialite authentication flow implementation
 
 Hej! is a simple authentication flow implementation for Socialite. Out-of-the-box, Hej! can help you login and register users using Socialite providers, or link and unlink social accounts, just by extending a controller.
 
+- [Hej! - a Socialite authentication flow implementation](#hej---a-socialite-authentication-flow-implementation)
+  - [🤝 Supporting](#-supporting)
+  - [🚀 Installation](#-installation)
+  - [🙌 Usage](#-usage)
+  - [Extending Controllers](#extending-controllers)
+    - [Provider whitelisting](#provider-whitelisting)
+    - [Custom Socialite Redirect & Retrieval](#custom-socialite-redirect--retrieval)
+    - [Registering new users](#registering-new-users)
+      - [Handling duplicated E-Mail addresses](#handling-duplicated-e-mail-addresses)
+      - [Filling the Social table](#filling-the-social-table)
+    - [Callbacks](#callbacks)
+    - [Redirects](#redirects)
+    - [Link & Unlink](#link--unlink)
+    - [Custom Authenticatable](#custom-authenticatable)
+  - [🐛 Testing](#-testing)
+  - [🤝 Contributing](#-contributing)
+  - [🔒  Security](#--security)
+  - [🎉 Credits](#-credits)
+
 ## 🤝 Supporting
 
 Renoki Co. on GitHub aims on bringing a lot of open source projects and helpful projects to the world. Developing and maintaining projects everyday is a harsh work and tho, we love it.
@@ -62,14 +81,13 @@ Out-of-the-box, it works with any Laravel application.
 After you have configured Socialite, the only thing to do is to point your desired redirect and callback paths to the package controller:
 
 ```php
-Route::get('/social/{provider}/redirect', 'RenokiCo\Hej\Http\Controllers\SocialController@redirect');
-Route::get('/social/{provider}/callback', 'RenokiCo\Hej\Http\Controllers\SocialController@callback');
+Route::get('/social/{provider}/redirect', [\RenokiCo\Hej\Http\Controllers\SocialController::class, 'redirect']);
+Route::get('/social/{provider}/callback', [\RenokiCo\Hej\Http\Controllers\SocialController::class, 'callback']);
 
-Route::get('/social/{provider}/link', 'RenokiCo\Hej\Http\Controllers\SocialController@link')
-    ->middleware('auth');
-
-Route::get('/social/{provider}/unlink', 'RenokiCo\Hej\Http\Controllers\SocialController@unlink')
-    ->middleware('auth');
+Route::middleware('auth')->group(function () {
+    Route::get('/social/{provider}/link', [\RenokiCo\Hej\Http\Controllers\SocialController::class, 'link']);
+    Route::get('/social/{provider}/unlink', [\RenokiCo\Hej\Http\Controllers\SocialController::class, 'unlink']);
+});
 ```
 
 The paths can be any, as long as they contain a first parameter which is going to be the provider you try to authenticate with. For example, accessing this link will redirect to Github:
@@ -95,7 +113,7 @@ class MySocialController extends SocialController
 
 Then you should point the routes to the new controller.
 
-## Provider whitelisting
+### Provider whitelisting
 
 Due to the fact that the endpoints are opened to get any provider, you can whitelist the Socialite provider names that can be used:
 
@@ -114,34 +132,14 @@ For example, allowing only Facebook and Github should look like this:
 
 ```php
 protected static $allowedSocialiteProviders = [
-    'facebook', 'github',
+    'facebook',
+    'github',
 ];
 ```
 
-If one of the providers accessed via the URL is not whitelisted, a simple redirect is done automatically. However, you can replace it and redirect to your custom path:
+If one of the providers accessed via the URL is not whitelisted, a simple redirect is done automatically. However, you can replace it and redirect to your custom [redirect action](#redirects).
 
-```php
-use Illuminate\Support\Facades\Redirect;
-use Illuminate\Support\Facades\Session;
-
-/**
- * Handle the callback when a provider gets rejected.
- *
- * @param  \Illuminate\Http\Request  $request
- * @param  string  $provider
- * @return \Illuminate\Http\RedirectResponse
- */
-protected function providerRejected(Request $request, $provider)
-{
-    $provider = ucfirst($provider);
-
-    Session::flash('social', "The authentication with {$provider} failed!");
-
-    return Redirect::route('home');
-}
-```
-
-## Custom Redirect & User retrieval
+### Custom Socialite Redirect & Retrieval
 
 With Socialite, you can use `->redirect()` to redirect the user and `->user()` to retrieve it. You can customize the instances by replacing `getSocialiteRedirect` and `getSocialiteUser`.
 
@@ -180,109 +178,100 @@ protected function getSocialiteUser(Request $request, string $provider)
 }
 ```
 
-## Link & Unlink
+### Registering new users
 
-Prior to creating new accounts or logging in with Socialite providers, Hej! comes with support to link and unlink Social accounts to and from your users.
+When the Social account that the user logged in is not registered within the database, it creates a new authenticatable model, but in order to do this, it should fill it with data.
 
-You will need to have the routes accessible only for your authenticated users:
-
-```php
-Route::get('/social/{provider}/link', 'RenokiCo\Hej\Http\Controllers\SocialController@link')
-    ->middleware('auth');
-
-Route::get('/social/{provider}/unlink', 'RenokiCo\Hej\Http\Controllers\SocialController@unlink')
-    ->middleware('auth');
-```
-
-Further, you may access the URLs to link or unlink providers.
-
-Additionally, you may implement custom redirect for various events happening during link/unlink:
+By default, it fills in using Socialite Provider's given data and sets a random 64-letter word password:
 
 ```php
-use Illuminate\Support\Facades\Redirect;
-use Illuminate\Support\Facades\Session;
-
 /**
- * Handle the callback when the user tries
- * to link a social account when it
- * already has one, with the same provider.
+ * Get the Authenticatable model data to fill on register.
+ * When the user gets created, it will receive these parameters
+ * in the `::create()` method.
  *
  * @param  \Illuminate\Http\Request  $request
  * @param  string  $provider
- * @param  \Illuminate\Database\Eloquent\Model  $model
- * @return \Illuminate\Http\RedirectResponse
+ * @param  \Laravel\Socialite\AbstractUser  $providerUser
+ * @return array
  */
-protected function providerAlreadyLinked(Request $request, $provider, $model)
+protected function getRegisterData(Request $request, string $provider, $providerUser): array
 {
-    $provider = ucfirst($provider);
-
-    Session::flash(
-        'social', "You already have a {$provider} account linked."
-    );
-
-    return Redirect::route('home');
+    return [
+        'name' => $providerUser->getName(),
+        'email' => $providerUser->getEmail(),
+        'email_verified_at' => now(),
+        'password' => Hash::make(Str::random(64)),
+    ];
 }
+```
 
+#### Handling duplicated E-Mail addresses
+
+Sometimes, it can happen for the users to have an account created with E-Mail address only, having no social accounts. A new social account with the same E-Mail address will trigger a new authenticatable record in the database on callback.
+
+For this, a [Redirect](#redirects) is made to handle this specific scenario.
+
+#### Filling the Social table
+
+After registration or login, the Socialite data gets created or updated, either the user existed or not.
+
+By default, it's recommended to not get overwritten, excepting for the fact you want to change the table structure and extend the `Social` model that is also set in `config/hej.php`.
+
+```php
 /**
- * Handle the callback when the user tries
- * to link a social account that is already existent.
+ * Get the Social model data to fill on register or login.
  *
  * @param  \Illuminate\Http\Request  $request
  * @param  string  $provider
  * @param  \Illuminate\Database\Eloquent\Model  $model
  * @param  \Laravel\Socialite\AbstractUser  $providerUser
- * @return \Illuminate\Http\RedirectResponse
+ * @return array
  */
-protected function providerAlreadyLinkedByAnotherAuthenticatable(Request $request, $provider, $model, $providerUser)
+protected function getSocialData(Request $request, string $provider, $model, $providerUser): array
 {
-    $provider = ucfirst($provider);
-
-    Session::flash(
-        'social', "Your {$provider} account is already linked to another account."
-    );
-
-    return Redirect::route('home');
+    return [
+        'provider_nickname' => $providerUser->getNickname(),
+        'provider_name' => $providerUser->getName(),
+        'provider_email' => $providerUser->getEmail(),
+        'provider_avatar' => $providerUser->getAvatar(),
+    ];
 }
+```
 
+### Callbacks
+
+Right before the user is authenticated or registered successfully, there exist callback that trigger and you can replace them for some custom logic.
+
+```php
 /**
- * Handle the user redirect after linking.
+ * Handle the callback after the registration process.
  *
  * @param  \Illuminate\Http\Request  $request
  * @param  \Illuminate\Database\Eloquent\Model  $model
  * @param  \Illuminate\Database\Eloquent\Model  $social
  * @param  \Laravel\Socialite\AbstractUser  $providerUser
- * @return \Illuminate\Http\RedirectResponse
+ * @return void
  */
-protected function redirectAfterLink(Request $request, $model, $social, $providerUser)
+protected function registered(Request $request, $model, $social, $providerUser)
 {
-    $provider = ucfirst($social->provider);
-
-    Session::flash('social', "The {$provider} account has been linked to your account.");
-
-    return Redirect::route('home');
+    //
 }
 
 /**
- * Handle the user redirect after unlinking.
+ * Handle the callback after the login process.
  *
  * @param  \Illuminate\Http\Request  $request
  * @param  \Illuminate\Database\Eloquent\Model  $model
- * @param  string  $provider
- * @return \Illuminate\Http\RedirectResponse
+ * @param  \Illuminate\Database\Eloquent\Model  $social
+ * @param  \Laravel\Socialite\AbstractUser  $providerUser
+ * @return void
  */
-protected function redirectAfterUnlink(Request $request, $model, string $provider)
+protected function authenticated(Request $request, $model, $social, $providerUser)
 {
-    $provider = ucfirst($provider);
-
-    Session::flash('social', "The {$provider} account has been unlinked.");
-
-    return Redirect::route('home');
+    //
 }
-```
 
-In support to this, you may also benefit from two callbacks where you can run your custom business logic:
-
-```php
 /**
  * Handle the callback after the linking process.
  *
@@ -311,7 +300,137 @@ protected function unlinked(Request $request, $model, string $provider)
 }
 ```
 
-## Custom Authenticatable
+### Redirects
+
+You are free to overwrite the actions' redirects within the controller:
+
+```php
+use Illuminate\Support\Facades\Redirect;
+use Illuminate\Support\Facades\Session;
+
+/**
+ * Specify the redirection route after successful authentication.
+ *
+ * @param  \Illuminate\Database\Eloquent\Model  $model
+ * @return \Illuminate\Http\RedirectResponse
+ */
+protected function redirectToAfterAuthentication($model)
+{
+    return Redirect::route('home');
+}
+
+/**
+ * Specify the redirection route to let the users know
+ * the authentication using the selected provider was rejected.
+ *
+ * @param  \Illuminate\Http\Request  $request
+ * @param  string  $provider
+ * @return \Illuminate\Http\RedirectResponse
+ */
+protected function redirectToAfterProviderIsRejected(Request $request, $provider)
+{
+    return Redirect::route('home');
+}
+
+/**
+ * Specify the redirection route to let the users know
+ * the E-Mail address used with this social account is
+ * already existent as another account. This is most often
+ * occuring during registrations with Social accounts.
+ *
+ * @param  \Illuminate\Http\Request  $request
+ * @param  string  $provider
+ * @param  \Laravel\Socialite\AbstractUser  $providerUser
+ * @return \Illuminate\Http\RedirectResponse
+ */
+protected function redirectToAfterDuplicateEmail(Request $request, $provider, $providerUser)
+{
+    return Redirect::route('home');
+}
+```
+
+### Link & Unlink
+
+Prior to creating new accounts or logging in with Socialite providers, Hej! comes with support to link and unlink Social accounts to and from your users.
+
+You will need to have the routes accessible only for your authenticated users:
+
+```php
+Route::middleware('auth')->group(function () {
+    Route::get('/social/{provider}/link', [\RenokiCo\Hej\Http\Controllers\SocialController::class, 'link']);
+    Route::get('/social/{provider}/unlink', [\RenokiCo\Hej\Http\Controllers\SocialController::class, 'unlink']);
+});
+```
+
+Further, you may access the URLs to link or unlink providers.
+
+Additionally, you may implement custom redirect for various events happening during link/unlink:
+
+```php
+use Illuminate\Support\Facades\Redirect;
+use Illuminate\Support\Facades\Session;
+
+/**
+ * Specify the redirection route to let the users know
+ * the social account is already associated with their account.
+ *
+ * @param  \Illuminate\Http\Request  $request
+ * @param  string  $provider
+ * @param  \Illuminate\Database\Eloquent\Model  $model
+ * @return \Illuminate\Http\RedirectResponse
+ */
+protected function redirectToAfterProviderIsAlreadyLinked(Request $request, $provider, $model)
+{
+    return Redirect::route('home');
+}
+
+/**
+ * Specify the redirection route to let the users know
+ * the social account is associated with another account.
+ *
+ * @param  \Illuminate\Http\Request  $request
+ * @param  string  $provider
+ * @param  \Illuminate\Database\Eloquent\Model  $model
+ * @param  \Laravel\Socialite\AbstractUser  $providerUser
+ * @return \Illuminate\Http\RedirectResponse
+ */
+protected function redirectToAfterProviderAlreadyLinkedByAnotherAuthenticatable(
+    Request $request, $provider, $model, $providerUser
+) {
+    return Redirect::route('home');
+}
+
+/**
+ * Specify the redirection route to let the users know
+ * they linked the social account.
+ *
+ * @param  \Illuminate\Http\Request  $request
+ * @param  \Illuminate\Database\Eloquent\Model  $model
+ * @param  \Illuminate\Database\Eloquent\Model  $social
+ * @param  \Laravel\Socialite\AbstractUser  $providerUser
+ * @return \Illuminate\Http\RedirectResponse
+ */
+protected function redirectToAfterLink(Request $request, $model, $social, $providerUser)
+{
+    return Redirect::route('home');
+}
+
+/**
+ * Specify the redirection route to let the users
+ * they have unlinked the social account.
+ *
+ * @param  \Illuminate\Http\Request  $request
+ * @param  \Illuminate\Database\Eloquent\Model  $model
+ * @param  string  $provider
+ * @return \Illuminate\Http\RedirectResponse
+ */
+protected function redirectToAfterUnlink(Request $request, $model, string $provider)
+{
+    return Redirect::route('home');
+}
+```
+
+### Custom Authenticatable
 
 When trying to login or register, the package uses the default `App\User` as defined in `config/hej.php`. However, this can easily be replaced at the request level:
 
@@ -343,152 +462,6 @@ public function getAuthenticatable(Request $request, string $provider)
 ```
 
 **Keep in mind that the model should also use the Trait and the Interface and be `Authenticatable`.**
-
-## Register new user
-
-When the Social account that the user logged in is not registered within the database, it creates a new authenticatable model, but in order to do this, it should fill it with data.
-
-By default, it fills in using Socialite Provider's given data and sets a random 64-letter word password:
-
-```php
-/**
- * Get the Authenticatable model data to fill on register.
- * When the user gets created, it will receive these parameters
- * in the `::create()` method.
- *
- * @param  \Illuminate\Http\Request  $request
- * @param  string  $provider
- * @param  \Laravel\Socialite\AbstractUser  $providerUser
- * @return array
- */
-protected function getRegisterData(Request $request, string $provider, $providerUser): array
-{
-    return [
-        'name' => $providerUser->getName(),
-        'email' => $providerUser->getEmail(),
-        'email_verified_at' => now(),
-        'password' => Hash::make(Str::random(64)),
-    ];
-}
-```
-
-## Handling duplicated E-Mail addresses
-
-Sometimes, it can happen for the users to have an account created with E-Mail address only, having no social accounts. A new social account with the same E-Mail address will trigger a new authenticatable record in the database on callback.
-
-Hej! addresses this issue by checking for duplicated E-Mail address. You may handle the redirection within `duplicateEmail`:
-
-```php
-use Illuminate\Support\Facades\Redirect;
-use Illuminate\Support\Facades\Session;
-
-/**
- * Handle the callback when the user's social account
- * E-Mail address is already used.
- *
- * @param  \Illuminate\Http\Request  $request
- * @param  string  $provider
- * @param  \Laravel\Socialite\AbstractUser  $providerUser
- * @return \Illuminate\Http\RedirectResponse
- */
-protected function duplicateEmail(Request $request, $provider, $providerUser)
-{
-    $provider = ucfirst($provider);
-
-    Session::flash(
-        'social', "The E-Mail address associated with your {$provider} account is already used."
-    );
-
-    return Redirect::route('register');
-}
-```
-
-## Filling the Social table
-
-After registration or login, the Socialite data gets created or updated, either the user existed or not.
-
-By default, it's recommended to not get overwritten, excepting for the fact you want to change the table structure and extend the `Social` model that is also set in `config/hej.php`.
-
-```php
-/**
- * Get the Social model data to fill on register or login.
- *
- * @param  \Illuminate\Http\Request  $request
- * @param  string  $provider
- * @param  \Illuminate\Database\Eloquent\Model  $model
- * @param  \Laravel\Socialite\AbstractUser  $providerUser
- * @return array
- */
-protected function getSocialData(Request $request, string $provider, $model, $providerUser): array
-{
-    return [
-        'provider_nickname' => $providerUser->getNickname(),
-        'provider_name' => $providerUser->getName(),
-        'provider_email' => $providerUser->getEmail(),
-        'provider_avatar' => $providerUser->getAvatar(),
-    ];
-}
-```
-
-## Authentication Callback
-
-After the business authentication logic finished, it's time to authenticate the model. To do so, your `authenticateModel` method should return a redirect response:
-
-This is how the default method looks like:
-
-```php
-use Illuminate\Support\Facades\Redirect;
-use Illuminate\Support\Facades\Session;
-
-/**
- * Handle the user login and redirection.
- *
- * @param  \Illuminate\Database\Eloquent\Model  $model
- * @return \Illuminate\Http\RedirectResponse
- */
-protected function authenticateModel($model)
-{
-    Auth::login($model);
-
-    Session::flash('social', 'Welcome back in your account!');
-
-    return Redirect::route('home');
-}
-```
-
-## Final Callbacks
-
-Right before the user is authenticated and redirected, there are two callbacks that trigger and you can replace them for some custom logic:
-
-```php
-/**
- * Handle the callback after the registration process.
- *
- * @param  \Illuminate\Http\Request  $request
- * @param  \Illuminate\Database\Eloquent\Model  $model
- * @param  \Illuminate\Database\Eloquent\Model  $social
- * @param  \Laravel\Socialite\AbstractUser  $providerUser
- * @return void
- */
-protected function registered(Request $request, $model, $social, $providerUser)
-{
-    //
-}
-
-/**
- * Handle the callback after the login process.
- *
- * @param  \Illuminate\Http\Request  $request
- * @param  \Illuminate\Database\Eloquent\Model  $model
- * @param  \Illuminate\Database\Eloquent\Model  $social
- * @param  \Laravel\Socialite\AbstractUser  $providerUser
- * @return void
- */
-protected function authenticated(Request $request, $model, $social, $providerUser)
-{
-    //
-}
-```
 
 ## 🐛 Testing
 
