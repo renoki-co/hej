@@ -34,7 +34,7 @@
         "mockery/mockery": "^1.4",
         "orchestra/database": "^5.0|^6.0",
         "orchestra/testbench": "^5.0|^6.0",
-        "orchestra/testbench-browser-kit": "^5.0|^6.0"
+        "orchestra/testbench-browser-kit": "^6.16.1"
     },
     "config": {
         "sort-packages": true
