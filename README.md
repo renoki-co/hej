@@ -1,8 +1,6 @@
 Hej! - a Socialite authentication flow implementation
 =====================================================
 
-![](images/hej.png)
-
 ![CI](https://github.com/renoki-co/hej/workflows/CI/badge.svg?branch=master)
 [![codecov](https://codecov.io/gh/renoki-co/hej/branch/master/graph/badge.svg)](https://codecov.io/gh/renoki-co/hej/branch/master)
 [![StyleCI](https://github.styleci.io/repos/282196287/shield?branch=master)](https://github.styleci.io/repos/282196287)
@@ -34,11 +32,9 @@ Hej! is a simple authentication flow implementation for Socialite. Out-of-the-bo
 
 ## 🤝 Supporting
 
+**If you are using one or more Renoki Co. open-source packages in your production apps, in presentation demos, hobby projects, school projects or so, sponsor our work with [Github Sponsors](https://github.com/sponsors/rennokki). 📦**
+
 [<img src="https://github-content.s3.fr-par.scw.cloud/static/23.jpg" height="210" width="418" />](https://github-content.renoki.org/github-repo/23)
-
-If you are using one or more Renoki Co. open-source packages in your production apps, in presentation demos, hobby projects, school projects or so, spread some kind words about our work or sponsor our work via Patreon. 📦
-
-[<img src="https://c5.patreon.com/external/logo/become_a_patron_button.png" height="41" width="175" />](https://www.patreon.com/bePatron?u=10965171)
 
 ## 🚀 Installation
 
