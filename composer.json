@@ -1,7 +1,19 @@
 {
     "name": "renoki-co/hej",
     "description": "Hej! is a simple authentication boilerplate for Socialite.",
-    "keywords": ["laravel", "php", "social", "login", "register", "socialite", "facebook", "github", "twitter", "gitlab", "google"],
+    "keywords": [
+        "laravel",
+        "php",
+        "social",
+        "login",
+        "register",
+        "socialite",
+        "facebook",
+        "github",
+        "twitter",
+        "gitlab",
+        "google"
+    ],
     "license": "Apache-2.0",
     "homepage": "https://github.com/renoki-co/hej",
     "authors": [
@@ -12,8 +24,8 @@
         }
     ],
     "require": {
-        "illuminate/database": "^7.30|^8.24",
-        "illuminate/support": "^7.30|^8.24",
+        "illuminate/database": "^7.30|^8.24|^9.0",
+        "illuminate/support": "^7.30|^8.24|^9.0",
         "laravel/socialite": "^5.0"
     },
     "autoload": {
@@ -31,9 +43,9 @@
     },
     "require-dev": {
         "laravel/legacy-factories": "^1.3",
-        "mockery/mockery": "^1.5",
+        "mockery/mockery": "^1.5|^1.4.4",
         "orchestra/database": "^5.0|^6.0",
-        "orchestra/testbench": "^6.24.0",
+        "orchestra/testbench": "^6.24.0|^7.0",
         "orchestra/testbench-browser-kit": "^6.17.2"
     },
     "config": {
