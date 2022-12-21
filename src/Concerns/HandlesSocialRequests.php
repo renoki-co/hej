@@ -227,7 +227,15 @@ trait HandlesSocialRequests
 
         return $socialModel::whereProvider($provider)
             ->whereProviderId($id)
-            ->whereModelType($this->getAuthenticatable($request, $provider))
+            ->where(function($query) use ($request, $provider) {
+                $model_type = $this->getAuthenticatable($request, $provider);
+
+                $alias = (new $model_type)->getMorphClass();
+
+                $query
+                    ->where('model_type', $model_type)
+                    ->orWhere('model_type', $alias);
+            })
             ->first();
     }
 
