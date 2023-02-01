@@ -33,8 +33,8 @@ class SocialController extends Controller
     {
         $this->socialite = $socialite;
 
-        if (config('hej.allowed_providers')) {
-            static::$allowedSocialiteProviders = config('hej.allowed_providers');
+        if ($allowedProviders = config('hej.allowed_providers')) {
+            static::$allowedSocialiteProviders = $allowedProviders;
         }
     }
 
