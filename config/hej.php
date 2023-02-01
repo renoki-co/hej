@@ -32,6 +32,41 @@ return [
     |
     */
 
-    'default_authenticatable' => \App\User::class,
+    'default_authenticatable' => \App\Models\User::class,
+
+    /*
+    |--------------------------------------------------------------------------
+    | Redirects
+    |--------------------------------------------------------------------------
+    |
+    | Specify the route names to use as redirects after different actions.
+    | These can be also overwritten if you extend the controller class.
+    |
+    */
+
+    'redirects' => [
+        'authenticated' => 'home',
+        'provider_rejected' => 'home',
+        'duplicate_email' => 'home',
+        'provider_already_linked' => 'home',
+        'provider_linked_to_another' => 'home',
+        'link' => 'home',
+        'unlink' => 'home',
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Allowed Providers
+    |--------------------------------------------------------------------------
+    |
+    | This will overwrite the list of allowed providers within the controller.
+    |
+    */
+
+    'allowed_providers' => [
+        // 'facebook',
+        // 'twitter',
+        // 'github',
+    ],
 
 ];

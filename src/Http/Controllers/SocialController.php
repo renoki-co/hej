@@ -19,7 +19,7 @@ class SocialController extends Controller
     /**
      * The Socialite factory instance.
      *
-     * @var Laravel\Socialite\Contracts\Factory
+     * @var \Laravel\Socialite\Contracts\Factory
      */
     protected $socialite;
 
@@ -32,6 +32,10 @@ class SocialController extends Controller
     public function __construct(Socialite $socialite)
     {
         $this->socialite = $socialite;
+
+        if ($allowedProviders = config('hej.allowed_providers')) {
+            static::$allowedSocialiteProviders = $allowedProviders;
+        }
     }
 
     /**
@@ -321,7 +325,7 @@ class SocialController extends Controller
      */
     protected function redirectToAfterAuthentication($model)
     {
-        return Redirect::route('home');
+        return Redirect::route(config('hej.redirects.authenticated', 'home'));
     }
 
     /**
@@ -334,7 +338,7 @@ class SocialController extends Controller
      */
     protected function redirectToAfterProviderIsRejected(Request $request, $provider)
     {
-        return Redirect::route('home');
+        return Redirect::route(config('hej.redirects.provider_rejected', 'home'));
     }
 
     /**
@@ -350,7 +354,7 @@ class SocialController extends Controller
      */
     protected function redirectToAfterDuplicateEmail(Request $request, $provider, $providerUser)
     {
-        return Redirect::route('home');
+        return Redirect::route(config('hej.redirects.duplicate_email', 'home'));
     }
 
     /**
@@ -364,7 +368,7 @@ class SocialController extends Controller
      */
     protected function redirectToAfterProviderIsAlreadyLinked(Request $request, $provider, $model)
     {
-        return Redirect::route('home');
+        return Redirect::route(config('hej.redirects.provider_already_linked', 'home'));
     }
 
     /**
@@ -380,7 +384,7 @@ class SocialController extends Controller
     protected function redirectToAfterProviderAlreadyLinkedByAnotherAuthenticatable(
         Request $request, $provider, $model, $providerUser
     ) {
-        return Redirect::route('home');
+        return Redirect::route(config('hej.redirects.provider_linked_to_another', 'home'));
     }
 
     /**
@@ -395,7 +399,7 @@ class SocialController extends Controller
      */
     protected function redirectToAfterLink(Request $request, $model, $social, $providerUser)
     {
-        return Redirect::route('home');
+        return Redirect::route(config('hej.redirects.link', 'home'));
     }
 
     /**
@@ -409,6 +413,6 @@ class SocialController extends Controller
      */
     protected function redirectToAfterUnlink(Request $request, $model, string $provider)
     {
-        return Redirect::route('home');
+        return Redirect::route(config('hej.redirects.unlink', 'home'));
     }
 }

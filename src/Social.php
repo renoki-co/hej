@@ -9,11 +9,7 @@ class Social extends Model
     /**
      * {@inheritdoc}
      */
-    protected $fillable = [
-        'model_id', 'model_type', 'provider', 'provider_id',
-        'provider_nickname', 'provider_name', 'provider_email',
-        'provider_avatar',
-    ];
+    protected $guarded = [];
 
     /**
      * Get the model that uses this Social instance.
